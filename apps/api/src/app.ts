@@ -412,6 +412,13 @@ export async function buildApp(options: AppOptions = {}) {
     readiness: getIapReadiness(),
   }));
 
+  app.get("/v1/meta/play-api-probe", async () => {
+    const { probeGooglePlayApiAccess } = await import(
+      "./services/google-play-verify.js"
+    );
+    return { probe: await probeGooglePlayApiAccess() };
+  });
+
   app.get("/v1/meta/economy", async () => ({
     economy: getEconomyMeta(),
   }));

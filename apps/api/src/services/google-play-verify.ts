@@ -106,6 +106,67 @@ export function isGooglePlayApiConfigured(): boolean {
   );
 }
 
+export type GooglePlayApiProbe = {
+  configured: boolean;
+  oauthOk: boolean;
+  apiAccessOk: boolean;
+  httpStatus?: number;
+  reason?: string;
+};
+
+/** Verifies SA OAuth and Play Console API access (Grant access). */
+export async function probeGooglePlayApiAccess(): Promise<GooglePlayApiProbe> {
+  const pkg = process.env.GOOGLE_PLAY_PACKAGE_NAME?.trim();
+  const sa = parseServiceAccount();
+  if (!pkg || !sa) {
+    return {
+      configured: false,
+      oauthOk: false,
+      apiAccessOk: false,
+      reason: "not_configured",
+    };
+  }
+
+  const token = await getAccessToken(sa);
+  if (!token) {
+    return {
+      configured: true,
+      oauthOk: false,
+      apiAccessOk: false,
+      reason: "oauth_failed",
+    };
+  }
+
+  const url = `${`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(pkg)}`}/inappproducts?maxResults=1`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.ok) {
+    return {
+      configured: true,
+      oauthOk: true,
+      apiAccessOk: true,
+      httpStatus: res.status,
+    };
+  }
+  if (res.status === 403) {
+    return {
+      configured: true,
+      oauthOk: true,
+      apiAccessOk: false,
+      httpStatus: 403,
+      reason: "play_console_grant_access_required",
+    };
+  }
+  return {
+    configured: true,
+    oauthOk: true,
+    apiAccessOk: false,
+    httpStatus: res.status,
+    reason: "api_error",
+  };
+}
+
 export async function verifyGooglePlayPurchase(
   productId: string,
   receipt: string,

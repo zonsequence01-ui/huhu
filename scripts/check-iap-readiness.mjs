@@ -30,7 +30,11 @@ if (!r.productionReady) {
   const missing = [];
   if (!r.strict) missing.push("IAP_STRICT=true");
   if (!r.ios.configured) missing.push("Apple credentials");
-  if (!r.android.playApi) missing.push("GOOGLE_PLAY_SERVICE_ACCOUNT_JSON");
+  if (!r.android.playApi) {
+    missing.push(
+      "GOOGLE_PLAY_PACKAGE_NAME + SA (Secret File or GOOGLE_PLAY_SERVICE_ACCOUNT_JSON)",
+    );
+  }
   if (process.env.NODE_ENV !== "production") {
     missing.push("NODE_ENV=production");
   }

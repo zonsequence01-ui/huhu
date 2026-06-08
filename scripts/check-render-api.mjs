@@ -56,6 +56,25 @@ async function main() {
               console.log(
                 "  → Set Play SA via Render Secret File google-play-sa.json (pnpm export:play-api-setup)",
               );
+            } else if (r.android?.playApi === true) {
+              try {
+                const probeRes = await fetch(`${base}/v1/meta/play-api-probe`, {
+                  signal: AbortSignal.timeout(45_000),
+                });
+                if (probeRes.ok) {
+                  const { probe } = await probeRes.json();
+                  console.log(
+                    `  play-api-probe: oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.reason ? ` (${probe.reason})` : ""}`,
+                  );
+                  if (probe.oauthOk && !probe.apiAccessOk) {
+                    console.log(
+                      "  → Grant Play Console API access to SA (pnpm export:play-api-setup)",
+                    );
+                  }
+                }
+              } catch {
+                console.log("  play-api-probe: skipped (timeout)");
+              }
             }
           }
         } catch {

@@ -6,6 +6,7 @@ import {
   GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH,
   isGooglePlayApiConfigured,
   parseGooglePlayReceipt,
+  probeGooglePlayApiAccess,
   resolveGooglePlayServiceAccountPath,
 } from "./google-play-verify.js";
 
@@ -62,5 +63,18 @@ describe("google-play-verify", () => {
     expect(GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH).toBe(
       "/etc/secrets/google-play-sa.json",
     );
+  });
+
+  it("probe returns not_configured without credentials", async () => {
+    delete process.env.GOOGLE_PLAY_PACKAGE_NAME;
+    delete process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON;
+    delete process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_PATH;
+
+    await expect(probeGooglePlayApiAccess()).resolves.toEqual({
+      configured: false,
+      oauthOk: false,
+      apiAccessOk: false,
+      reason: "not_configured",
+    });
   });
 });

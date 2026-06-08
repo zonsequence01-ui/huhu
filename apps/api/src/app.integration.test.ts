@@ -1484,6 +1484,24 @@ describe("API integration", () => {
     expect(typeof body.readiness.android.playApi).toBe("boolean");
   });
 
+  it("returns play-api-probe shape", async () => {
+    const res = await built.app.inject({
+      method: "GET",
+      url: "/v1/meta/play-api-probe",
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as {
+      probe: {
+        configured: boolean;
+        oauthOk: boolean;
+        apiAccessOk: boolean;
+      };
+    };
+    expect(typeof body.probe.configured).toBe("boolean");
+    expect(typeof body.probe.oauthOk).toBe("boolean");
+    expect(typeof body.probe.apiAccessOk).toBe("boolean");
+  });
+
   it("returns store listing ASO copy by market", async () => {
     const markets = await built.app.inject({
       method: "GET",

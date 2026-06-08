@@ -33,8 +33,9 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 - [x] release AAB 已上傳（`dist/android-release/com.ctrlz.huhu-release.aab`）
 - [x] SKU 六檔已啟用（訂閱 lite/basic/premium + 幣包 small/medium/large，173 國）
 - [ ] **12 名 opt-in 測試者 × 14 天**（目前 1/12）
-- [ ] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
-- [ ] 封閉測試驗證 `gp:<token>` 收據（需 playApi）
+- [x] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
+- [ ] Play Console **Grant access** 授權 SA（`pnpm check:play-api`）
+- [ ] 封閉測試驗證 `gp:<token>` 收據（需 apiAccessOk）
 
 ## 客戶端
 
