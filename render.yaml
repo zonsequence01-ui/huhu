@@ -14,8 +14,11 @@ services:
         value: "3000"
       - key: HOST
         value: 0.0.0.0
+      # Set in Render Dashboard (Neon Postgres); do not commit secrets or SQLite path
       - key: DATABASE_URL
-        value: file:/app/data/huhu.db
+        sync: false
+      - key: RATE_LIMIT_BACKEND
+        sync: false
       - key: STORE_PUBLIC_SITE_URL
         value: https://huhu-app.pages.dev
       - key: LLM_PROVIDER
