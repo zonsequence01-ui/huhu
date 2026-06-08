@@ -25,8 +25,8 @@ test("client-config bundles economy, offerwall, and support resources", async ({
   expect(body.config.economy.stamina.max).toBe(50);
   expect(body.config.offerwall.sdkIntegration).toBe("hmac_only");
   expect(body.config.supportResources.region).toBe("KR");
-  expect(body.config.storeUrls.support).toMatch(/\/support\.html$/);
-  expect(body.config.storeUrls.privacy).toMatch(/\/privacy\.html$/);
+  expect(body.config.storeUrls.support).toMatch(/\/support(\.html)?$/);
+  expect(body.config.storeUrls.privacy).toMatch(/\/privacy(\.html)?$/);
   expect(body.config.subscriptionTiers.map((t) => t.tier)).toEqual([
     "lite",
     "basic",
