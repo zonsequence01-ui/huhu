@@ -205,7 +205,7 @@ export async function buildApp(options: AppOptions = {}) {
   const appDatabaseUrl =
     options.databaseUrl ??
     (options.dbPath
-      ? undefined
+      ? `file:${options.dbPath}`
       : process.env.DATABASE_URL?.trim());
   const dbHandle = await createDatabase({
     url: appDatabaseUrl,

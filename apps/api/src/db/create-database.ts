@@ -34,7 +34,10 @@ export interface CreateDatabaseOptions {
 export async function createDatabase(
   options: CreateDatabaseOptions = {},
 ): Promise<DatabaseHandle> {
-  const url = options.url?.trim() ?? resolveDatabaseUrl();
+  const explicitUrl = options.url?.trim();
+  const url =
+    explicitUrl ??
+    (options.path ? `file:${options.path}` : resolveDatabaseUrl());
 
   if (isPostgresDatabaseUrl(url)) {
     usePostgresSchema();

@@ -72,6 +72,20 @@ CREATE INDEX memory_chunks_embedding_idx
   WITH (lists = 100);
 ```
 
+## Neon 空庫／schema 衝突（營運）
+
+若 Neon 上已有**舊專案**留下的表（例如 `characters.id` 為 UUID，與現版 `pg-init.ts` 的 TEXT 不一致），Render 首次 Postgres 部署會因 FK 型別不符而失敗。
+
+**僅在確認無需保留生產資料時**執行：
+
+```bash
+set DATABASE_URL=postgresql://...@...neon.tech/huhu?sslmode=require
+pnpm reset:neon-schema
+```
+
+接著在 Render Dashboard → **Manual Deploy**。API 啟動時 `pg-init.ts` 會重建表結構。
+
 ## 風險
 
 - OpenAI `text-embedding-3-small` 維度為 1536，mock 為 384；遷移前需統一 `VECTOR_DIMENSION`。
+- `pnpm reset:neon-schema` 會 `DROP SCHEMA public CASCADE`，不可對含使用者資料的庫執行。

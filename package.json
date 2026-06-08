@@ -10,6 +10,7 @@
     "test": "pnpm -r run test",
     "test:integration": "pnpm --filter @huhu/api run test:integration",
     "db:migrate-to-postgres": "node scripts/migrate-sqlite-to-postgres.mjs",
+    "reset:neon-schema": "node apps/api/scripts/reset-neon-schema.mjs",
     "test:e2e": "playwright test -c e2e/playwright.config.ts",
     "export:store-catalog": "node scripts/export-store-catalog.mjs",
     "export:store-catalog:files": "node scripts/export-store-catalog.mjs --out dist/store-catalog",

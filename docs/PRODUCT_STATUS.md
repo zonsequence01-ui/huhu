@@ -20,7 +20,7 @@
 | 隱私 | 關係重置、RAG 列表／單筆刪除／全部清除、刪除帳號 API+Web/Flutter；清除對話、單則刪除；Web/Flutter 隱私頁記憶片段列表；`POST /v1/chat` 回傳 `userMessageId`／`reply.id` |
 | 客戶端 | Release 建置預設 API `https://huhu-app.pages.dev`（`api_config.dart` + `--dart-define=API_BASE`）；Web／Flutter 角色切換、經濟規則與模式消耗提示、`GET /v1/meta/client-config` 單次載入（含 `subscriptionTiers` + `tierDisplayName` + `subscriptionTiersPrompt`）、`GET /v1/users/me` 回傳 `subscriptionTierDisplayName`、訂閱+幣包 PPP、訂閱對話框／狀態列／設定頁方案與權益摘要皆**在地化**（含免費 `tierNameFree`）、9 個 API 錯誤碼於 **zh-TW／zh-CN／en／ja-JP／ko-KR／vi-VN** 完整在地化；`client-config.apiErrors` 與 `@huhu/shared` `formatApiErrorMessage` 同步（BCP-47 正規化）、Web 無效 `characterId` 自動恢復（`recoverMissingCharacter`）、訂閱／隱私 dialog、好友 QR／封鎖、安全／角色修正氣泡；Web/Flutter 無 body 請求不帶 JSON Content-Type；API `onRequest` 亦會剝除空 body 的 JSON Content-Type |
 | 部署 | Dockerfile、docker-compose、`docker-compose.prod.yml` + Caddy TLS 範例、`pnpm export:deploy-bundle`、`pnpm verify:docker`、生產 `JWT_SECRET` 啟動防護、`/health` 部署欄位 |
-| Postgres | `DATABASE_URL=postgresql://...` 切換應用表 + health 回報 driver |
+| Postgres | `DATABASE_URL=postgresql://...` 切換應用表 + health 回報 driver；**生產** Render→Neon 已驗證（`database: postgres`、`vectorStore: pgvector`） |
 | UI i18n | `GET /v1/meta/ui-strings`、Web/Flutter 設定與角色建立 |
 | IAP | Apple `verifyReceipt`、Google Play API scaffold、收據冪等；Flutter `in_app_purchase` + 恢復購買 |
 | 遷移 | `scripts/migrate-sqlite-to-postgres.mjs`、CI Postgres job |

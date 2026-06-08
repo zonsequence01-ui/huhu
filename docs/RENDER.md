@@ -8,6 +8,9 @@
 | Blueprint | `huhu`（`render.yaml`） |
 | GitHub | `https://github.com/zonsequence01-ui/huhu` |
 | Pages 代理 | `https://huhu-app.pages.dev` → `API_ORIGIN` |
+| 資料庫 | **Neon Postgres**（`DATABASE_URL` 於 Dashboard 設定；Blueprint `sync: false` 防覆寫） |
+| 向量庫 | pgvector（與 `DATABASE_URL` 同庫） |
+| 限速 | `RATE_LIMIT_BACKEND=postgres` |
 
 驗證：
 
@@ -17,29 +20,40 @@ CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site
 pnpm smoke:api:prod
 ```
 
+`/health` 預期：`database: postgres`、`vectorStore: pgvector`、`rateLimit.backend: db`。
+
 ## Free tier 限制
 
-- **無 persistent disk**：`DATABASE_URL=file:/app/data/huhu.db` 在容器重啟後清空。
 - **冷啟動**：閒置 ~15 分鐘後首請求可能需 30–90 秒；App 已對 bootstrap 做重試。
+- **無 Shell**（Free）：除錯依 Render Logs 與本機 `pnpm check:render`。
 
-## 持久化（建議）
+## 環境變數（Dashboard）
 
-1. 建立 [Neon](https://neon.tech) 或 Render Postgres 免費／付費實例。
-2. Render Dashboard → **huhu-api** → Environment → 設定：
-   - `DATABASE_URL=postgresql://...`
-   - （可選）`PGVECTOR_URL=postgresql://...`
-   - （可選）`RATE_LIMIT_BACKEND=postgres`
-3. Manual Deploy 或 push 觸發 Blueprint sync。
+| 變數 | 說明 |
+|------|------|
+| `DATABASE_URL` | Neon `postgresql://...`（**勿**設 `file:`） |
+| `JWT_SECRET` | 必填；未設則 API 拒絕啟動 |
+| `RATE_LIMIT_BACKEND` | 建議 `postgres` |
+| `LLM_PROVIDER` | 預設 `mock`；生產可改 `hybrid` + 商用 API |
+| `VECTOR_STORE` | 未設且 Postgres 時自動 pgvector |
+
+`render.yaml` 中 `DATABASE_URL`、`RATE_LIMIT_BACKEND` 為 `sync: false`，避免 Blueprint 覆寫為 SQLite。
+
+## Schema 衝突
+
+Neon 若含舊表結構，部署可能 FK 失敗。見 `docs/POSTGRES.md` → `pnpm reset:neon-schema`（**會清空 public schema**）。
 
 ## 推送程式碼
 
 ```bash
-# Windows：清除錯誤的 gh 憑證後
+# Windows：PAT 需含 repo + workflow scope
 set GITHUB_TOKEN=ghp_...
 pnpm push:github
+# 或含 CI workflow 推送
+pnpm push:ci
 ```
 
-CI workflow 需 PAT 含 `workflow` scope；或使用 GitHub Actions 自動跑（push 到 main 後）。
+Push 到 `main` 後 GitHub Actions 跑完整 CI（node / postgres / flutter / docker-smoke）。
 
 ## 更新 Pages API 指向
 

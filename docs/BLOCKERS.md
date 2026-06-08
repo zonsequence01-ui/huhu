@@ -10,7 +10,7 @@
 
 |------|------|----------|
 
-| **Phase 2 生產 API（持久）** | **Neon Postgres 已連線**：Render `DATABASE_URL` → Neon `huhu` 專案；`RATE_LIMIT_BACKEND=postgres`。部署中/待驗證 `database: postgres` | `pnpm check:render`（應回 `database=postgres`） |
+| **Phase 2 生產 API（持久）** | **已驗證**：`https://huhu-api.onrender.com/health` → `database: postgres`、`vectorStore: pgvector`。Render `DATABASE_URL` → Neon `huhu`；Blueprint `sync: false` 防覆寫 | `pnpm check:render` |
 
 | App Store / Play 正式 IAP SKU | Play：**1.0.1 (2) 已發布**（封閉測試 Alpha，6/8 13:00）。Opt-in：`https://play.google.com/apps/testing/com.ctrlz.huhu`。**正式版權限**：✓ 封閉測試；✗ **12 名**測試人員（**1/12**）；✗ **14 天**期。App Store：Privacy URL OK；缺 **IPA**、IAP 憑證 | `pnpm check:launch`；`.env` → `pnpm check:iap` |
 
