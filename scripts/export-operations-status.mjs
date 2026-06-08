@@ -60,10 +60,22 @@ async function fetchStatus(url) {
   }
 }
 
-const [privacyStatus, supportStatus, healthStatus] = await Promise.all([
+const [privacyStatus, supportStatus, healthStatus, renderHealth] = await Promise.all([
   fetchStatus(STORE_PRIVACY_URL),
   fetchStatus(STORE_SUPPORT_URL),
   fetchStatus(`${siteBase}/health`),
+  (async () => {
+    try {
+      const res = await fetch("https://huhu-api.onrender.com/health", {
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!res.ok) return `HTTP ${res.status}`;
+      const body = await res.json();
+      return `database=${body.database ?? "?"} vectorStore=${body.vectorStore ?? "?"}`;
+    } catch {
+      return "unreachable";
+    }
+  })(),
 ]);
 const prodSite = healthStatus === "200" ? "up" : healthStatus;
 
@@ -79,6 +91,7 @@ const lines = [
   `- privacy: **${privacyStatus}** (${STORE_PRIVACY_URL})`,
   `- support: **${supportStatus}**`,
   `- /health: **${prodSite}**`,
+  `- Render API: **${renderHealth}** (\`pnpm check:render\`)`,
   `- check: \`pnpm check:site\` (blocks Play/ASC until privacy 200)`,
   `- verify: \`pnpm smoke:api:prod\` (uses PROD_SMOKE_URL to override)`,
   `- deploy: \`pnpm export:deploy-bundle\` → \`deploy-remote-static.example.sh\` (Phase 1)`,
@@ -142,6 +155,7 @@ const lines = [
   "pnpm smoke:api   # SMOKE_BASE_URL against running API",
   "pnpm smoke:api:prod",
   "pnpm check:site",
+  "pnpm check:render",
   "pnpm verify:docker",
   "pnpm ship:android",
   "pnpm export:deploy-bundle",
