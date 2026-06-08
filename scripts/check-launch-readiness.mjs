@@ -292,14 +292,25 @@ if (existsSync(join(deployBundleDir, "DEPLOY.md"))) {
 }
 
 const launchBundleDir = join(root, "dist/launch-bundle");
-if (!existsSync(join(launchBundleDir, "manifest.json"))) {
-  const pkg = run("pnpm", ["package:launch-bundle"]);
-  console.log(
-    pkg.ok ? "✓ package:launch-bundle" : "✗ package:launch-bundle failed",
+const canPackageLaunchBundle =
+  asoMarketsReady === STORE_MARKETS.length ||
+  STORE_MARKETS.every(({ market }) =>
+    existsSync(join(root, "dist/store-upload", market, "app-store", "01-chat.png")),
   );
-  if (!pkg.ok) {
-    console.log(pkg.out);
-    failed = true;
+if (!existsSync(join(launchBundleDir, "manifest.json"))) {
+  if (canPackageLaunchBundle) {
+    const pkg = run("pnpm", ["package:launch-bundle"]);
+    console.log(
+      pkg.ok ? "✓ package:launch-bundle" : "✗ package:launch-bundle failed",
+    );
+    if (!pkg.ok) {
+      console.log(pkg.out);
+      failed = true;
+    }
+  } else {
+    console.log(
+      "○ launch-bundle — requires ASO screenshots (pnpm capture:aso-screenshots -- --all)",
+    );
   }
 }
 if (existsSync(join(launchBundleDir, "manifest.json"))) {

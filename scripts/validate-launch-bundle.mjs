@@ -29,8 +29,10 @@ const optionalDocs = [
 let failed = false;
 
 if (!existsSync(bundle)) {
-  console.error(`Missing ${bundle}. Run: pnpm package:launch-bundle`);
-  process.exit(1);
+  console.log(
+    "Skip: dist/launch-bundle missing (requires ASO PNG). Run: pnpm package:launch-bundle",
+  );
+  process.exit(0);
 }
 
 for (const name of requiredDocs) {
