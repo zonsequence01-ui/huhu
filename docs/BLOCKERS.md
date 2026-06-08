@@ -10,7 +10,7 @@
 
 |------|------|----------|
 
-| **Phase 2 生產 API（持久）** | **Render 已部署**：`https://huhu-api.onrender.com/health` 200。GitHub：`https://github.com/zonsequence01-ui/huhu`。Pages → **API_ORIGIN** 待同步 Render URL。**注意**：Free tier 無 persistent disk，重啟後 SQLite 資料會重置 | `CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site`；`pnpm smoke:api:prod` |
+| **Phase 2 生產 API（持久）** | **Render 已部署**：`https://huhu-api.onrender.com/health` 200；Pages `API_ORIGIN` 已指向 Render。**P1**：Free tier 無 disk，重啟後 SQLite 清空；冷啟動 30–90s。持久化：Neon/Render Postgres → 設 `DATABASE_URL`（見 `docs/RENDER.md`） | `pnpm check:render`；`CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site` |
 
 | App Store / Play 正式 IAP SKU | Play：**1.0.1 (2) 已發布**（封閉測試 Alpha，6/8 13:00）。Opt-in：`https://play.google.com/apps/testing/com.ctrlz.huhu`。**正式版權限**：✓ 封閉測試；✗ **12 名**測試人員（**1/12**）；✗ **14 天**期。App Store：Privacy URL OK；缺 **IPA**、IAP 憑證 | `pnpm check:launch`；`.env` → `pnpm check:iap` |
 

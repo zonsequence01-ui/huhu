@@ -23,8 +23,45 @@ class HuhuApi {
 
   void setToken(String? token) => _token = token;
 
+  static const _requestTimeout = Duration(seconds: 90);
+  static const _retryDelays = [
+    Duration(seconds: 2),
+    Duration(seconds: 5),
+    Duration(seconds: 10),
+  ];
+
+  Future<http.Response> _postWithRetry(
+    Uri uri, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    Object? lastError;
+    for (var i = 0; i <= _retryDelays.length; i++) {
+      try {
+        final res = await http
+            .post(uri, headers: headers, body: body)
+            .timeout(_requestTimeout);
+        if (res.statusCode >= 500 && i < _retryDelays.length) {
+          await Future<void>.delayed(_retryDelays[i]);
+          continue;
+        }
+        return res;
+      } catch (e) {
+        lastError = e;
+        if (i < _retryDelays.length) {
+          await Future<void>.delayed(_retryDelays[i]);
+          continue;
+        }
+        rethrow;
+      }
+    }
+    throw lastError ?? Exception('request_failed');
+  }
+
   Future<Map<String, dynamic>> bootstrap() async {
-    final res = await http.post(Uri.parse('$baseUrl/v1/users/bootstrap'));
+    final res = await _postWithRetry(
+      Uri.parse('$baseUrl/v1/users/bootstrap'),
+    );
     _throwIfFailed(res);
     return jsonDecode(res.body) as Map<String, dynamic>;
   }

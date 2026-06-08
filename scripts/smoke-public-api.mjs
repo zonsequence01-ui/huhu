@@ -14,19 +14,46 @@ const base = (process.env.SMOKE_BASE_URL ?? "http://127.0.0.1:3000").replace(
   "",
 );
 
+const prodRetry =
+  base.startsWith("https://") && process.env.SMOKE_NO_RETRY !== "1";
+
 async function get(path) {
-  const res = await fetch(`${base}${path}`);
-  const text = await res.text();
-  let json;
-  try {
-    json = JSON.parse(text);
-  } catch {
-    throw new Error(`${path} invalid JSON (${res.status})`);
+  const maxAttempts = prodRetry ? 8 : 1;
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(`${base}${path}`, {
+        signal: AbortSignal.timeout(90_000),
+      });
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error(`${path} invalid JSON (${res.status})`);
+      }
+      if (!res.ok) {
+        if (
+          prodRetry &&
+          attempt < maxAttempts &&
+          (res.status >= 502 || res.status === 429)
+        ) {
+          await new Promise((r) => setTimeout(r, 5000));
+          continue;
+        }
+        throw new Error(`${path} HTTP ${res.status}: ${text.slice(0, 200)}`);
+      }
+      return json;
+    } catch (err) {
+      lastErr = err;
+      if (prodRetry && attempt < maxAttempts) {
+        await new Promise((r) => setTimeout(r, 5000));
+        continue;
+      }
+      throw err;
+    }
   }
-  if (!res.ok) {
-    throw new Error(`${path} HTTP ${res.status}: ${text.slice(0, 200)}`);
-  }
-  return json;
+  throw lastErr ?? new Error(`${path} failed`);
 }
 
 const checks = [
