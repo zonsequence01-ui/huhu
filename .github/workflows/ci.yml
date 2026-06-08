@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm export:operations-status
+      - run: pnpm validate:operations-status
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:integration
+      - run: pnpm smoke:api:local
+      - run: node scripts/export-store-catalog.mjs tw | grep -q com.ctrlz.huhu.sub.lite
+      - run: node scripts/export-store-catalog.mjs --out /tmp/huhu-catalog && test -f /tmp/huhu-catalog/tw.json
+      - run: pnpm export:store-catalog:files
+      - run: pnpm validate:store-listings
+      - run: pnpm validate:store-catalog
+      - run: pnpm check:launch
+        env:
+          SKIP_SMOKE: "1"
+      - run: pnpm validate:launch-bundle
+      - run: pnpm validate:dist-store-catalog
+      - run: pnpm exec playwright install chromium --with-deps
+      - run: pnpm test:e2e
+
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: huhu
+          POSTGRES_PASSWORD: huhu
+          POSTGRES_DB: huhu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U huhu"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://huhu:huhu@localhost:5432/huhu
+      AGE_GATE: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm --filter @huhu/api exec vitest run src/app.postgres.integration.test.ts
+
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t huhu-api:smoke .
+      - run: |
+          cid=$(docker run -d -p 3000:3000 \
+            -e JWT_SECRET=ci-smoke-secret \
+            -e LLM_PROVIDER=mock \
+            -e AGE_GATE=0 \
+            huhu-api:smoke)
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:3000/health | grep -q '"clientConfig":"/v1/meta/client-config"'; then
+              curl -sf http://127.0.0.1:3000/v1/meta/locales | grep -q zh-TW
+              curl -sf http://127.0.0.1:3000/v1/meta/economy | grep -q '"max":50'
+              curl -sf http://127.0.0.1:3000/v1/meta/support-resources?locale=ja-JP | grep -q いのち
+              curl -sf http://127.0.0.1:3000/v1/meta/store-catalog?market=tw | grep -q '"currency":"TWD"'
+              curl -sf http://127.0.0.1:3000/v1/meta/store-catalog | grep -q '"market":"cn"'
+              curl -sf http://127.0.0.1:3000/v1/meta/iap-products | grep -q com.ctrlz.huhu.sub.lite
+              curl -sf 'http://127.0.0.1:3000/v1/meta/client-config?locale=en-US' | grep -q '"max":50'
+              curl -sf http://127.0.0.1:3000/v1/meta/offerwall | grep -q hmac_only
+              curl -sf 'http://127.0.0.1:3000/v1/meta/support-resources?locale=zh-TW' | grep -q privacyReminder
+              curl -sf http://127.0.0.1:3000/v1/meta/iap-readiness | grep -q productionReady
+              docker rm -f "$cid"
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$cid" || true
+          docker rm -f "$cid"
+          exit 1
