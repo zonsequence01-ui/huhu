@@ -1,4 +1,5 @@
 import { createSign } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { IAP_PRODUCTS, subscriptionBonusCoins } from "./iap-products.js";
 import type { VerifyReceiptResult } from "./iap.js";
 
@@ -7,8 +8,36 @@ interface ServiceAccount {
   private_key: string;
 }
 
+/** Render secret files mount at /etc/secrets/<filename> */
+export const GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH =
+  "/etc/secrets/google-play-sa.json";
+
+export function resolveGooglePlayServiceAccountPath(): string | null {
+  const explicit = process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_PATH?.trim();
+  if (explicit) return explicit;
+  if (
+    process.env.NODE_ENV === "production" &&
+    existsSync(GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH)
+  ) {
+    return GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH;
+  }
+  return null;
+}
+
+function loadServiceAccountRaw(): string | null {
+  const envRaw = process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON?.trim();
+  if (envRaw) return envRaw;
+  const path = resolveGooglePlayServiceAccountPath();
+  if (!path) return null;
+  try {
+    return readFileSync(path, "utf8").trim();
+  } catch {
+    return null;
+  }
+}
+
 function parseServiceAccount(): ServiceAccount | null {
-  const raw = process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON?.trim();
+  const raw = loadServiceAccountRaw();
   if (!raw) return null;
   try {
     return JSON.parse(raw) as ServiceAccount;

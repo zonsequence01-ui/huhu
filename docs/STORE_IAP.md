@@ -9,7 +9,7 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 | 嚴格驗證 | `IAP_STRICT=true` | 未設定商店憑證時拒絕 IAP（禁止 dev stub） |
 | Apple 舊版收據 | `APPLE_IAP_SHARED_SECRET` | `verifyReceipt`；sandbox 用 `APPLE_IAP_SANDBOX=1` |
 | Apple Server API v2 | `APPLE_APP_STORE_*` | JWS `signedTransaction` 驗簽 |
-| Google Play | `GOOGLE_PLAY_PACKAGE_NAME` + `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` | Play Developer API |
+| Google Play | `GOOGLE_PLAY_PACKAGE_NAME` + (`GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` **或** Secret File `google-play-sa.json` → `/etc/secrets/google-play-sa.json`) | Play Developer API |
 
 ## App Store Connect
 
@@ -29,10 +29,12 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 ## Google Play Console
 
 - [x] 建立應用程式 `com.ctrlz.huhu`（CTRL//Z 開發者帳號）
-- [ ] **上傳 release AAB**（`pnpm validate:android-release` → `dist/android-release/com.ctrlz.huhu-release.aab`）
+- [x] **Alpha 1.0.2 (3) 已發布**（封閉測試；`pnpm export:play-closed-test`）
+- [x] release AAB 已上傳（`dist/android-release/com.ctrlz.huhu-release.aab`）
 - [x] SKU 六檔已啟用（訂閱 lite/basic/premium + 幣包 small/medium/large，173 國）
-- [ ] 服務帳號 JSON 上傳 API 存取權
-- [ ] 內部測試軌道驗證 `gp:<token>` 收據
+- [ ] **12 名 opt-in 測試者 × 14 天**（目前 1/12）
+- [ ] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
+- [ ] 封閉測試驗證 `gp:<token>` 收據（需 playApi）
 
 ## 客戶端
 

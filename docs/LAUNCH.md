@@ -36,9 +36,13 @@ pnpm export:operations-status   # dist/OPERATIONS_STATUS.md（IAP + 產物摘要
 
 1. 依 `dist/iap-store-checklist/{market}.md` 建立訂閱與消耗型 SKU（見 `docs/STORE_IAP.md`）。
 2. 各區域價格層級對齊 `dist/store-catalog/{market}.json` 的 PPP。
-3. 上傳 `app-store-captioned/` 或 `google-play-captioned/` 六張截圖。
+3. 上傳 `app-store-captioned/` 或 `google-play-captioned/` 六張截圖。  
+   - Play 手動上傳：`dist/store-upload/tw/google-play-captioned/`  
+   - 本地預覽／fetch 輔助：`pnpm serve:play-store-upload-png`（8769）或 `pnpm serve:store-upload-png`
 4. 貼上 `dist/aso-brief/{market}.md` 中的標題、副標題、關鍵字、描述。
 5. 沙盒帳號驗證訂閱與呼呼幣包；設定 `IAP_STRICT` 與 Apple/Google 憑證後執行 `pnpm check:iap`。
+6. **Google Play 正式版權限**：`pnpm export:play-closed-test` → 依 `dist/play-closed-test/README.md` 招募 **12** 名 opt-in 測試者並等待 **14** 天。
+7. **Play AAB 上傳（瀏覽器自動化）**：`pnpm ship:android` → `pnpm serve:android-aab` → `pnpm play:aab-inject-snippet`（CDP `Runtime.evaluate`）。Alpha 軌道 ID 見 `scripts/play-console-ids.mjs`。
 
 ## 三、生產 API（人工）
 

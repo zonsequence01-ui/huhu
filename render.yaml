@@ -29,6 +29,11 @@ services:
         value: mock
       - key: GOOGLE_PLAY_PACKAGE_NAME
         value: com.ctrlz.huhu
+      # Play SA: Secret File google-play-sa.json mounts at /etc/secrets/
+      - key: GOOGLE_PLAY_SERVICE_ACCOUNT_PATH
+        value: /etc/secrets/google-play-sa.json
+      - key: IAP_STRICT
+        value: "true"
       - key: JWT_SECRET
         generateValue: true
       # Optional: set in Render Dashboard for persistent data (Neon / Render Postgres)

@@ -41,6 +41,26 @@ async function main() {
         console.log(
           `✓ /health OK (attempt ${i}, database=${body.database}, vectorStore=${body.vectorStore}, rateLimit=${rl})`,
         );
+
+        try {
+          const iapRes = await fetch(`${base}/v1/meta/iap-readiness`, {
+            signal: AbortSignal.timeout(30_000),
+          });
+          if (iapRes.ok) {
+            const iap = await iapRes.json();
+            const r = iap.readiness ?? iap;
+            console.log(
+              `  iap-readiness: productionReady=${r.productionReady} strict=${r.strict} playApi=${r.android?.playApi ?? false}`,
+            );
+            if (r.android?.playApi === false) {
+              console.log(
+                "  → Set Play SA via Render Secret File google-play-sa.json (pnpm export:play-api-setup)",
+              );
+            }
+          }
+        } catch {
+          console.log("  iap-readiness: skipped (timeout)");
+        }
         return;
       }
       console.log(`attempt ${i}: HTTP ${res.status}`);

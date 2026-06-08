@@ -5,6 +5,7 @@
 | 項目 | 值 |
 |------|-----|
 | API | `https://huhu-api.onrender.com` |
+| Service ID | `srv-d8jaq8uk1jcs73f59mig`（Dashboard → Environment） |
 | Blueprint | `huhu`（`render.yaml`） |
 | GitHub | `https://github.com/zonsequence01-ui/huhu` |
 | Pages 代理 | `https://huhu-app.pages.dev` → `API_ORIGIN` |
@@ -38,6 +39,16 @@ pnpm smoke:api:prod
 | `VECTOR_STORE` | 未設且 Postgres 時自動 pgvector |
 
 `render.yaml` 中 `DATABASE_URL`、`RATE_LIMIT_BACKEND` 為 `sync: false`，避免 Blueprint 覆寫為 SQLite。
+
+## IAP（Google Play）
+
+| 方式 | 設定 |
+|------|------|
+| Secret File（推薦） | 上傳 `google-play-sa.json` → API 自動讀 `/etc/secrets/google-play-sa.json` |
+| 環境變數 | `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` 或 `GOOGLE_PLAY_SERVICE_ACCOUNT_PATH` |
+| 嚴格模式 | `IAP_STRICT=true`（需 iOS + Play API 憑證齊全） |
+
+詳見 `pnpm export:play-api-setup` → `dist/play-api-setup/README.md`。
 
 ## Schema 衝突
 
