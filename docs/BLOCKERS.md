@@ -10,7 +10,7 @@
 
 |------|------|----------|
 
-| **Phase 2 生產 API（持久）** | **暫時可用**：`https://huhu-app.pages.dev/health` 200（Pages → **API_ORIGIN** → trycloudflare 隧道）。維運：`pnpm start:prod-stack`、`pnpm health:prod-stack`。**P0 風險**：隧道/API 停機即全站失效。持久化：Render `render.yaml`（需 git push + GitHub 連線）或 VPS `docker-compose.prod.yml` | `CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site`；`pnpm smoke:api:prod` |
+| **Phase 2 生產 API（持久）** | **Render 已部署**：`https://huhu-api.onrender.com/health` 200。GitHub：`https://github.com/zonsequence01-ui/huhu`。Pages → **API_ORIGIN** 待同步 Render URL。**注意**：Free tier 無 persistent disk，重啟後 SQLite 資料會重置 | `CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site`；`pnpm smoke:api:prod` |
 
 | App Store / Play 正式 IAP SKU | Play：**1.0.1 (2) 已發布**（封閉測試 Alpha，6/8 13:00）。Opt-in：`https://play.google.com/apps/testing/com.ctrlz.huhu`。**正式版權限**：✓ 封閉測試；✗ **12 名**測試人員（**1/12**）；✗ **14 天**期。App Store：Privacy URL OK；缺 **IPA**、IAP 憑證 | `pnpm check:launch`；`.env` → `pnpm check:iap` |
 
