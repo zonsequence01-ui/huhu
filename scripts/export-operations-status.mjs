@@ -3,6 +3,7 @@
  * Usage: pnpm export:operations-status
  */
 import { writeFileSync, existsSync, readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import dns from "node:dns/promises";
@@ -166,10 +167,9 @@ const lines = [
 writeFileSync(out, `${lines.join("\n")}\n`);
 console.log(`Wrote ${out}`);
 
-const { spawnSync } = await import("node:child_process");
-const val = spawnSync("pnpm", ["validate:operations-status"], {
-  cwd: root,
-  shell: true,
-  stdio: "inherit",
-});
+const val = spawnSync(
+  process.execPath,
+  [join(root, "scripts/validate-operations-status.mjs")],
+  { cwd: root, stdio: "inherit" },
+);
 if (val.status !== 0) process.exit(val.status ?? 1);
