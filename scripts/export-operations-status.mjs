@@ -2,7 +2,7 @@
  * Write dist/OPERATIONS_STATUS.md for release/ops handoff.
  * Usage: pnpm export:operations-status
  */
-import { writeFileSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, existsSync, readFileSync, mkdirSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -164,6 +164,7 @@ const lines = [
   "",
 ];
 
+mkdirSync(join(root, "dist"), { recursive: true });
 writeFileSync(out, `${lines.join("\n")}\n`);
 console.log(`Wrote ${out}`);
 
