@@ -22,6 +22,8 @@
 
 | 生產 LLM 金鑰與 ZDR 合約 | 待營運 | `LLM_PROVIDER=hybrid` + 商用 API 企業條款 |
 
+| GitHub Actions CI | `.github/workflows/ci.yml` 已撰寫但未推送（PAT 缺 `workflow` scope） | 更新 PAT 後 `pnpm push:github` 或手動上傳 workflow |
+
 
 
 ## 封閉測試 App 連線
