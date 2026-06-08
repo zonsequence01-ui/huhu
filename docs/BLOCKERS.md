@@ -22,7 +22,7 @@
 
 | 生產 LLM 金鑰與 ZDR 合約 | 待營運 | `LLM_PROVIDER=hybrid` + 商用 API 企業條款 |
 
-| GitHub Actions CI | **修正中**：`export:operations-status`（`dist/` mkdir）、`check:launch`（無 ASO PNG 跳過 launch-bundle）、E2E storeUrls 已修 | GitHub → Actions |
+| GitHub Actions CI | **已通過**（`1269dc9`：node/postgres/flutter/docker-smoke 全綠） | https://github.com/zonsequence01-ui/huhu/actions |
 
 
 
