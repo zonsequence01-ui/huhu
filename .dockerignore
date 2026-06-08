@@ -1,0 +1,16 @@
+node_modules
+**/node_modules
+.git
+dist
+apps/mobile
+e2e
+playwright-report
+test-results
+**/*.md
+!apps/web/**/*.md
+.env
+.env.*
+apps/mobile/android/key.properties
+apps/mobile/android/upload-keystore.jks
+**/.dart_tool
+**/build

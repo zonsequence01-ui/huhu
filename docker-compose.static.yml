@@ -1,0 +1,24 @@
+# Phase 1: serve store-required static pages (privacy, support) with automatic TLS.
+# Unblocks Play / App Store privacy URL checks before full API deploy.
+#
+#   cp infra/Caddyfile.static.example infra/Caddyfile.static
+#   docker compose -f docker-compose.static.yml up -d
+#   curl -sI https://huhu.ctrlz.dev/privacy.html
+#
+# Phase 2: docker compose -f docker-compose.prod.yml --profile tls up --build -d
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/Caddyfile.static:/etc/caddy/Caddyfile:ro
+      - ./web:/srv:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

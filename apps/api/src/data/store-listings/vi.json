@@ -1,0 +1,26 @@
+{
+  "market": "vn",
+  "locale": "vi-VN",
+  "bundleId": "com.ctrlz.huhu",
+  "appStore": {
+    "name": "Huhu — Bạn ảo AI",
+    "subtitle": "AI nhớ bạn lâu dài",
+    "keywords": "AI,trò chuyện,bạn ảo,đồng hành,roleplay",
+    "promotionalText": "Stamina hồi tự nhiên. Giá PPP thân thiện.",
+    "description": "Huhu là bạn đồng hành AI với bộ nhớ dài hạn RAG, giai đoạn quan hệ và nhật ký.\n\n• Stamina + xu Huhu\n• Gói Lite/Basic/Premium giá VN\n\nKhông phải tư vấn y tế."
+  },
+  "googlePlay": {
+    "title": "Huhu — Bạn ảo AI",
+    "shortDescription": "Trò chuyện AI, nhớ lâu, stamina hồi",
+    "fullDescription": "Bạn ảo AI, ký ức dài, nhật ký, bạn bè."
+  },
+  "screenshotCaptions": [
+    "Trò chuyện",
+    "Chế độ",
+    "Tạo nhân vật",
+    "Nhật ký",
+    "Gói đăng ký",
+    "Quyền riêng tư"
+  ],
+  "ageRating": "18+"
+}

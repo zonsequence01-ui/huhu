@@ -1,0 +1,26 @@
+{
+  "market": "us",
+  "locale": "en",
+  "bundleId": "com.ctrlz.huhu",
+  "appStore": {
+    "name": "Huhu — AI Companion & Roleplay",
+    "subtitle": "AI that remembers you",
+    "keywords": "AI chat,virtual girlfriend,companion,roleplay,romance,AI partner",
+    "promotionalText": "Stamina regens over time. RAG long-term memory for your story together.",
+    "description": "Huhu is an AI companion built for emotional connection and roleplay, with retrieval-augmented long-term memory so your relationship stays coherent.\n\n• Stamina + Huhu Coins dual economy\n• Lite / Basic / Premium subscriptions with regional PPP pricing\n• Simple, long, and exciting chat modes\n• Diary, moments, and friends\n• Age 18+ confirmation without ID upload\n\nNot medical advice. If you are in crisis, contact local professional support."
+  },
+  "googlePlay": {
+    "title": "Huhu — AI Companion",
+    "shortDescription": "AI companion with memory & fair stamina",
+    "fullDescription": "Huhu is an AI companion with long-term memory, relationship stages, and fair stamina recovery for everyday chats.\n\n• Subscriptions and coin packs\n• Voice and photo chat (tiered)\n• Privacy controls and data deletion\n\nNot medical advice."
+  },
+  "screenshotCaptions": [
+    "Chat with affection meter",
+    "Chat modes",
+    "Character creator",
+    "Diary & moments",
+    "Plans & pricing",
+    "Privacy controls"
+  ],
+  "ageRating": "18+"
+}

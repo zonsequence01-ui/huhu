@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>呼呼 Huhu — ASO 文案</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="admin-page">
+  <header class="header">
+    <h1>ASO 商店文案預覽</h1>
+    <p class="hint">
+      資料來自 <code>GET /v1/meta/store-catalog</code>（含訂閱與呼呼幣包 PPP）。
+      截圖規格見 <code>docs/ASO_SCREENSHOTS.md</code>。
+      <a href="/">聊天</a> · <a href="/admin.html">動態覆核</a>
+    </p>
+  </header>
+  <section class="admin-controls">
+    <label>
+      市場
+      <select id="marketSelect">
+        <option value="tw">台灣 (tw)</option>
+        <option value="us">美國 (us)</option>
+        <option value="jp">日本 (jp)</option>
+        <option value="kr">韓國 (kr)</option>
+        <option value="cn">中国大陆 (cn)</option>
+        <option value="vn">越南 (vn)</option>
+      </select>
+    </label>
+    <button type="button" id="loadBtn">載入</button>
+    <button type="button" id="copyJsonBtn" class="secondary">複製 JSON</button>
+  </section>
+  <p id="asoStatus" class="hint" role="status"></p>
+  <article id="asoPreview" class="aso-preview"></article>
+  <script src="/aso.js" type="module"></script>
+</body>
+</html>

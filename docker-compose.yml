@@ -1,0 +1,54 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATABASE_URL: file:/app/data/huhu.db
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      TTS_PROVIDER: ${TTS_PROVIDER:-mock}
+      LLAMA_BASE_URL: ${LLAMA_BASE_URL:-}
+      HYBRID_COMMERCIAL_PROVIDER: ${HYBRID_COMMERCIAL_PROVIDER:-openai}
+      MOMENT_REPORT_HIDE_THRESHOLD: ${MOMENT_REPORT_HIDE_THRESHOLD:-3}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-}
+      IAP_STRICT: ${IAP_STRICT:-}
+      APPLE_IAP_SHARED_SECRET: ${APPLE_IAP_SHARED_SECRET:-}
+      GOOGLE_PLAY_PACKAGE_NAME: ${GOOGLE_PLAY_PACKAGE_NAME:-com.ctrlz.huhu}
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:-}
+      STORE_PUBLIC_SITE_URL: ${STORE_PUBLIC_SITE_URL:-https://huhu.ctrlz.dev}
+    volumes:
+      - huhu-data:/app/data
+    restart: unless-stopped
+
+  ollama:
+    profiles: ["llama"]
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: unless-stopped
+
+  postgres:
+    profiles: ["postgres"]
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: huhu
+      POSTGRES_PASSWORD: huhu
+      POSTGRES_DB: huhu
+    ports:
+      - "5432:5432"
+    volumes:
+      - huhu-pg:/var/lib/postgresql/data
+
+volumes:
+  huhu-data:
+  huhu-pg:
+  ollama-data:

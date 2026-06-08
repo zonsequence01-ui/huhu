@@ -1,0 +1,9 @@
+# Static-only deploy: privacy/support pages before full API stack.
+# Copy to infra/Caddyfile.static and set DNS A/AAAA for huhu.ctrlz.dev → this host.
+# Usage: docker compose -f docker-compose.static.yml up -d
+
+huhu.ctrlz.dev {
+	encode gzip
+	root * /srv
+	file_server
+}

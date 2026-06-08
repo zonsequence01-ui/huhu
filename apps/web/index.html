@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>呼呼 Huhu</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>呼呼 Huhu</h1>
+    <div class="affection-panel" id="affectionPanel" hidden>
+      <div class="affection-label">
+        <span id="stageLabel">陌生人</span>
+        <span id="affectionPercent">0%</span>
+      </div>
+      <div class="affection-track">
+        <div class="affection-fill" id="affectionFill"></div>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <p id="economyHint" class="economy-hint" hidden></p>
+  </header>
+  <div id="chatPrivacyBanner" class="chat-privacy-banner" hidden>
+    <p id="chatPrivacyText" class="chat-privacy-text"></p>
+    <button type="button" id="chatPrivacyDismiss" class="secondary chat-privacy-dismiss">知道了</button>
+  </div>
+  <main class="chat" id="chat"></main>
+  <form class="composer" id="composer">
+    <select id="mode" aria-label="對話模式">
+      <option value="simple">簡單</option>
+      <option value="long">長對話 (-5幣)</option>
+      <option value="exciting">心動 (-10幣)</option>
+    </select>
+    <input id="input" type="text" placeholder="輸入訊息…" autocomplete="off" />
+    <button type="button" id="voiceToggle" class="secondary" title="">🎤</button>
+    <button type="button" id="photoBtn" class="secondary" title="傳照片">📷</button>
+    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" hidden />
+    <button type="submit">送出</button>
+  </form>
+  <div class="toolbar">
+    <label class="character-picker">
+      <span id="characterLabel">角色</span>
+      <select id="characterSelect" aria-labelledby="characterLabel"></select>
+    </label>
+    <label class="locale-picker">
+      <span id="localeLabel">介面語系</span>
+      <select id="localeSelect" aria-labelledby="localeLabel"></select>
+    </label>
+    <label class="display-name-picker">
+      <span id="displayNameLabel">我的暱稱</span>
+      <input type="text" id="displayNameInput" maxlength="32" autocomplete="nickname" />
+      <button type="button" id="saveDisplayNameBtn" class="secondary">儲存</button>
+    </label>
+    <button type="button" id="checkinBtn" class="secondary">每日簽到</button>
+    <button type="button" id="offerwallBtn" class="secondary">看廣告領幣</button>
+    <button type="button" id="subscribeBtn" class="secondary">訂閱</button>
+    <span id="coinsToolbar" class="coins-toolbar"></span>
+    <button type="button" id="exportBtn" class="secondary">匯出對話</button>
+    <button type="button" id="diaryBtn" class="secondary">寫日記</button>
+    <button type="button" id="momentsBtn" class="secondary">動態</button>
+    <button type="button" id="createCharBtn" class="secondary">新角色</button>
+    <button type="button" id="privacyBtn" class="secondary">隱私</button>
+    <button type="button" id="supportBtn" class="secondary">支援資源</button>
+    <button type="button" id="friendsBtn" class="secondary">好友</button>
+    <a href="/aso.html" id="asoLink" class="secondary toolbar-link">ASO</a>
+  </div>
+  <dialog id="ageDialog">
+    <form method="dialog" id="ageForm">
+      <h2>年齡確認</h2>
+      <p>呼呼 Huhu 僅供年滿 18 歲使用者。請輸入出生年份以繼續（無需上傳證件）。</p>
+      <label>出生年份
+        <input name="birthYear" type="number" required min="1900" max="2010" />
+      </label>
+      <menu>
+        <button type="submit" value="ok">我確認已滿 18 歲</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="creatorDialog">
+    <form method="dialog" id="creatorForm">
+      <h2>建立角色</h2>
+      <label><span data-i18n="officialPreset">模板</span>
+        <select name="preset" id="presetSelect">
+          <option value="" data-i18n="customPreset">自訂</option>
+        </select>
+      </label>
+      <label><span data-i18n="name">名稱</span> <input name="name" required maxlength="64" /></label>
+      <label><span data-i18n="personality">性格</span> <input name="personality" id="personalityInput" required /></label>
+      <label><span data-i18n="backstory">背景</span> <textarea name="backstory" required rows="3"></textarea></label>
+      <label><span data-i18n="speakingStyle">語氣</span> <input name="speakingStyle" id="speakingStyleInput" required /></label>
+      <label><span data-i18n="chatLocale">語系</span>
+        <select name="locale" id="creatorLocale">
+          <option value="zh-TW" selected>繁體中文（台灣）</option>
+          <option value="zh-CN">简体中文</option>
+          <option value="ja-JP">日本語</option>
+          <option value="ko-KR">한국어</option>
+          <option value="en">English</option>
+        </select>
+      </label>
+      <menu>
+        <button type="reset" value="cancel">取消</button>
+        <button type="submit" value="ok">建立</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="diaryDialog">
+    <form method="dialog" id="diaryForm">
+      <h2 id="diaryDialogTitle">日記</h2>
+      <ul id="diaryList" class="diary-list"></ul>
+      <input type="hidden" name="entryId" id="diaryEntryId" value="" />
+      <label><span data-i18n="diaryTitle">標題</span>
+        <input name="title" id="diaryTitleInput" maxlength="120" />
+      </label>
+      <label><span data-i18n="diaryBody">內容</span>
+        <textarea name="body" id="diaryBodyInput" required rows="4"></textarea>
+      </label>
+      <menu>
+        <button type="button" id="diaryCancelBtn" value="cancel">取消</button>
+        <button type="submit" value="ok">保存</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="momentsDialog">
+    <form method="dialog" id="momentsForm">
+      <h2 id="momentsDialogTitle">動態</h2>
+      <div class="feed-tabs" role="tablist">
+        <button type="button" id="momentsTabMine" class="secondary" role="tab" aria-selected="true">我的動態</button>
+        <button type="button" id="momentsTabCommunity" class="secondary" role="tab">社群</button>
+        <button type="button" id="momentsTabFriends" class="secondary" role="tab">好友</button>
+      </div>
+      <ul id="momentsList" class="diary-list"></ul>
+      <p id="feedMomentsHint" class="hint"></p>
+      <label><span data-i18n="momentBody">內容</span>
+        <textarea name="body" id="momentBodyInput" required rows="3" maxlength="2000"></textarea>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="momentFriendsInput" />
+        <span data-i18n="momentPublishFriends">僅好友可見</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox" id="momentPublicInput" />
+        <span data-i18n="momentPublishPublic">發布至社群（公開）</span>
+      </label>
+      <input type="file" id="momentPhotoInput" accept="image/jpeg,image/png,image/webp" hidden />
+      <button type="button" id="momentPhotoBtn" class="secondary">附加照片</button>
+      <menu>
+        <button type="button" id="momentsCancelBtn" value="cancel">取消</button>
+        <button type="submit" value="ok">發布</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="friendsDialog">
+    <form method="dialog" id="friendsForm">
+      <h2 id="friendsDialogTitle">好友</h2>
+      <section class="friends-section">
+        <p class="hint" id="inviteCodeLabel">我的邀請碼</p>
+        <div class="invite-row">
+          <code id="myInviteCode">—</code>
+          <button type="button" id="copyInviteBtn" class="secondary">複製碼</button>
+          <button type="button" id="copyInviteLinkBtn" class="secondary">複製連結</button>
+        </div>
+        <img id="inviteQrImg" class="invite-qr" alt="" hidden />
+        <p id="inviteDeepLinkHint" class="hint" hidden></p>
+      </section>
+      <section class="friends-section">
+        <h3 id="blockedUsersTitle">已封鎖</h3>
+        <ul id="blockedUsersList" class="diary-list"></ul>
+      </section>
+      <section class="friends-section">
+        <h3 id="friendsIncomingTitle">待接受邀請</h3>
+        <ul id="friendsIncomingList" class="diary-list"></ul>
+      </section>
+      <section class="friends-section">
+        <h3 id="friendsOutgoingTitle">已送出邀請</h3>
+        <ul id="friendsOutgoingList" class="diary-list"></ul>
+      </section>
+      <section class="friends-section">
+        <h3 id="friendsListTitle">好友列表</h3>
+        <ul id="friendsListEl" class="diary-list"></ul>
+      </section>
+      <section class="friends-section">
+        <label>
+          <span id="searchFriendsLabel">搜尋好友</span>
+          <div class="invite-row">
+            <input type="search" id="friendSearchInput" maxlength="32" autocomplete="off" />
+            <button type="button" id="friendSearchBtn" class="secondary">搜尋</button>
+          </div>
+        </label>
+        <ul id="friendSearchResults" class="diary-list"></ul>
+      </section>
+      <label>
+        <span id="addFriendByCodeLabel">輸入對方的邀請碼</span>
+        <input type="text" id="inviteCodeInput" maxlength="12" autocomplete="off" autocapitalize="characters" />
+      </label>
+      <menu>
+        <button type="button" id="friendsCloseBtn" value="cancel">關閉</button>
+        <button type="submit" id="friendsSendBtn" value="send">送出邀請</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="subscribeDialog">
+    <form method="dialog" id="subscribeForm">
+      <h2 id="subscribeDialogTitle">訂閱</h2>
+      <p id="subscribeTiersPrompt" class="hint"></p>
+      <p id="subscribePricingHint" class="hint"></p>
+      <fieldset class="tier-options">
+        <label><input type="radio" name="tier" value="lite" checked /> <span class="tier-label" data-tier="lite"></span></label>
+        <label><input type="radio" name="tier" value="basic" /> <span class="tier-label" data-tier="basic"></span></label>
+        <label><input type="radio" name="tier" value="premium" /> <span class="tier-label" data-tier="premium"></span></label>
+      </fieldset>
+      <menu>
+        <button type="button" id="subscribeCancelBtn" value="cancel">取消</button>
+        <button type="submit" value="ok">確認</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="privacyDialog">
+    <form method="dialog" id="privacyForm">
+      <h2 id="privacyDialogTitle">隱私與資料</h2>
+      <p id="privacyDialogIntro" class="hint"></p>
+      <p id="supportResourcesHint" class="hint"></p>
+      <p id="privacyStoreLinks" class="store-links" hidden>
+        <a id="privacyPolicyLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <span id="privacyStoreLinksSep" hidden> · </span>
+        <a id="supportPageLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </p>
+      <section id="memoryFragmentsSection" class="memory-fragments" hidden>
+        <h3 id="memoryFragmentsTitle">長期記憶片段</h3>
+        <p id="memoryFragmentsEmpty" class="hint" hidden></p>
+        <ul id="memoryFragmentsList" class="memory-fragments-list"></ul>
+      </section>
+      <div class="privacy-actions">
+        <button type="button" class="secondary" data-privacy-action="reset" id="privacyResetBtn">重置關係進度</button>
+        <button type="button" class="secondary" data-privacy-action="rag" id="privacyRagBtn">清除 RAG 記憶</button>
+        <button type="button" class="secondary" data-privacy-action="messages" id="privacyMessagesBtn">清除對話紀錄</button>
+        <button type="button" class="secondary danger" data-privacy-action="account" id="privacyAccountBtn">刪除帳號全部資料</button>
+      </div>
+      <menu>
+        <button type="button" id="privacyCloseBtn" value="cancel">關閉</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="supportDialog">
+    <form method="dialog" id="supportForm">
+      <h2 id="supportDialogTitle">支援資源</h2>
+      <p id="supportPrivacyReminder" class="hint"></p>
+      <section id="supportCrisisSection">
+        <h3 id="supportCrisisTitle"></h3>
+        <ul id="supportCrisisLines"></ul>
+      </section>
+      <section id="supportWellnessSection">
+        <h3 id="supportWellnessTitle"></h3>
+        <ul id="supportWellnessLines"></ul>
+      </section>
+      <p id="supportStoreLinks" class="store-links" hidden>
+        <a id="supportPageExternalLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <span id="supportStoreLinksSep" hidden> · </span>
+        <a id="supportPrivacyExternalLink" href="#" target="_blank" rel="noopener noreferrer"></a>
+      </p>
+      <menu>
+        <button type="button" id="supportCloseBtn" value="cancel">關閉</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="photoCaptionDialog">
+    <form method="dialog" id="photoCaptionForm">
+      <h2 id="photoCaptionDialogTitle">照片說明</h2>
+      <label>
+        <span id="photoCaptionLabel">說明（可留空）</span>
+        <textarea name="caption" id="photoCaptionInput" rows="2" maxlength="500"></textarea>
+      </label>
+      <menu>
+        <button type="button" id="photoCaptionCancelBtn" value="cancel">取消</button>
+        <button type="submit" value="ok">送出</button>
+      </menu>
+    </form>
+  </dialog>
+  <dialog id="reportDialog">
+    <form method="dialog" id="reportForm">
+      <h2 id="reportDialogTitle">檢舉動態</h2>
+      <p id="reportDialogHint" class="hint"></p>
+      <fieldset id="reportReasons" class="tier-options"></fieldset>
+      <menu>
+        <button type="button" id="reportCancelBtn" value="cancel">取消</button>
+        <button type="submit" value="ok">送出</button>
+      </menu>
+    </form>
+  </dialog>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>呼呼 Huhu — 動態覆核</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="admin-page">
+  <header class="header">
+    <h1>動態營運覆核</h1>
+    <p class="hint">
+      需後端設定 <code>ADMIN_API_KEY</code>。金鑰僅存於本機瀏覽器。
+      <a href="/">返回聊天</a> · <a href="/aso.html">ASO 文案</a>
+    </p>
+  </header>
+  <section class="admin-controls">
+    <label>
+      Admin API Key
+      <input type="password" id="adminKey" autocomplete="off" />
+    </label>
+    <button type="button" id="saveKeyBtn" class="secondary">儲存金鑰</button>
+    <button type="button" id="refreshBtn">重新載入</button>
+  </section>
+  <p id="iapStatus" class="hint" role="status"></p>
+  <p id="economyStatus" class="hint" role="status"></p>
+  <p id="adminStatus" class="hint" role="status"></p>
+  <ul id="hiddenList" class="admin-moment-list"></ul>
+  <script src="/admin.js" type="module"></script>
+</body>
+</html>

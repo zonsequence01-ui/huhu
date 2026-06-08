@@ -1,0 +1,26 @@
+{
+  "market": "cn",
+  "locale": "zh-CN",
+  "bundleId": "com.ctrlz.huhu",
+  "appStore": {
+    "name": "呼呼 Huhu — AI 情感陪伴",
+    "subtitle": "记得住你的 AI 伴侣",
+    "keywords": "人工智能,聊天,虚拟女友,虚拟男友,情感陪伴,角色扮演,AI伴侣,恋爱模拟",
+    "promotionalText": "体力自然恢复，免费也能日常聊天。RAG 长期记忆，关系不断线。",
+    "description": "呼呼 Huhu 是专为情感陪伴设计的 AI 伴侣：通过 RAG 长期记忆记住你们的故事，好感度随对话成长。\n\n• 体力 + 呼呼币双轨，基础对话可自然恢复\n• Lite / Basic / Premium 订阅，中国大陆 PPP 定价参考\n• 简单、长对话、心动三种模式\n• 日记、动态与好友互动\n• 18+ 出生年份确认，无需上传证件\n\n本 App 不提供医疗诊断；若你正面临心理危机，请寻求专业协助。"
+  },
+  "googlePlay": {
+    "title": "呼呼 Huhu — AI 情感陪伴",
+    "shortDescription": "记得住你的 AI 伴侣，体力自然恢复",
+    "fullDescription": "呼呼 Huhu 是专为情感陪伴设计的 AI 伴侣：通过 RAG 长期记忆记住你们的故事，好感度随对话成长。\n\n• 体力 + 呼呼币双轨\n• Lite / Basic / Premium 订阅\n• 简单、长对话、心动三种模式\n• 日记、动态与好友互动\n\n本 App 不提供医疗诊断。"
+  },
+  "screenshotCaptions": [
+    "聊天与好感度仪表板",
+    "三种对话模式",
+    "角色创建",
+    "日记与动态",
+    "订阅与 PPP 定价",
+    "隐私与数据删除"
+  ],
+  "ageRating": "18+"
+}

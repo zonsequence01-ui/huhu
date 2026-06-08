@@ -1,0 +1,26 @@
+{
+  "market": "jp",
+  "locale": "ja-JP",
+  "bundleId": "com.ctrlz.huhu",
+  "appStore": {
+    "name": "呼呼 Huhu — AIパートナー",
+    "subtitle": "あなたを覚えているAI",
+    "keywords": "AI,チャット,彼氏,彼女,ロールプレイ,伴侶,恋愛",
+    "promotionalText": "スタミナ自然回復。RAGで長期記憶、関係が続く。",
+    "description": "呼呼 Huhuは感情寄り添いのAIパートナー。RAG長期記憶で物語を覚え、関係ステージが成長します。\n\n• スタミナ＋コインの二重経済\n• Lite/Basic/Premium（PPP価格）\n• 敬語・親密さに配慮した日本語応答\n\n医療アドバイスではありません。"
+  },
+  "googlePlay": {
+    "title": "呼呼 Huhu — AIパートナー",
+    "shortDescription": "記憶するAI伴侶・スタミナ回復",
+    "fullDescription": "感情寄り添いAI。長期記憶・関係成長・日記とモーメント。"
+  },
+  "screenshotCaptions": [
+    "チャットと好感度",
+    "モード切替",
+    "キャラ作成",
+    "日記",
+    "プラン",
+    "プライバシー"
+  ],
+  "ageRating": "18+"
+}

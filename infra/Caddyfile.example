@@ -1,0 +1,7 @@
+# Copy to infra/Caddyfile and set your domain. Used by docker-compose.prod.yml.
+# Requires DNS A/AAAA for huhu.ctrlz.dev → this host.
+
+huhu.ctrlz.dev {
+	encode gzip
+	reverse_proxy api:3000
+}

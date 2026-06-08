@@ -1,0 +1,54 @@
+# Production stack: API + optional Caddy TLS reverse proxy.
+# Usage:
+#   cp .env.example .env   # set JWT_SECRET, STORE_PUBLIC_SITE_URL, LLM keys
+#   docker compose -f docker-compose.prod.yml up --build -d
+#   pnpm smoke:api:prod
+services:
+  api:
+    build: .
+    ports:
+      - "${API_PORT:-3000}:3000"
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATABASE_URL: file:/app/data/huhu.db
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      TTS_PROVIDER: ${TTS_PROVIDER:-mock}
+      LLAMA_BASE_URL: ${LLAMA_BASE_URL:-}
+      HYBRID_COMMERCIAL_PROVIDER: ${HYBRID_COMMERCIAL_PROVIDER:-openai}
+      STORE_PUBLIC_SITE_URL: ${STORE_PUBLIC_SITE_URL:-https://huhu-app.pages.dev}
+      GOOGLE_PLAY_PACKAGE_NAME: ${GOOGLE_PLAY_PACKAGE_NAME:-com.ctrlz.huhu}
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:-}
+      IAP_STRICT: ${IAP_STRICT:-}
+      APPLE_IAP_SHARED_SECRET: ${APPLE_IAP_SHARED_SECRET:-}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-}
+      OFFERWALL_SECRET: ${OFFERWALL_SECRET:-}
+    volumes:
+      - huhu-data:/app/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["tls"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  huhu-data:
+  caddy-data:
+  caddy-config:
