@@ -35,9 +35,9 @@
 | 動態 | 公開／好友／私人 visibility；邀請碼／連結／QR、封鎖、暱稱搜尋 API+Web/Flutter；`/admin.html` 營運頁 | — |
 | 多語系 | 預設角色依 locale、`zh-CN` ASO+CNY PPP、`vi-VN` 完整 UI；`localeHint` + `relationshipStageBehavior` + `stageLabelForLocale`（API/UI 關係標籤） | 需生產級模型微調／GPU |
 | ASO | 同上 + `compose:aso-screenshots`（標題疊加）+ `validate:store-upload`（含 captioned 子資料夾）；`pnpm check:launch` | 手動上傳 `dist/store-upload/*`（建議 `*-captioned/`） |
-| IAP 營運 | Play 六檔 SKU + 內測 1.0.0 + **tw listing 已可送審**（icon + feature + 6 手機）；隱私 URL `https://huhu-app.pages.dev/privacy`；ASC 消耗型+訂閱 **Ready + 已附 iOS 1.0**；**App 截圖 6/6**、年齡 18+、Subtitle、Entertainment、**App Privacy 問卷已 Publish** | IPA（macOS）、IAP API 憑證、Play **送審按鈕仍 disabled**（控管型發布無法開啟）、ASC App Privacy URL Save（Apple 非同步驗證） |
+| IAP 營運 | Play **Alpha 1.0.2 (3) 已發布**；意見回饋 URL **審查中**；Opt-in **1/12**；Render `androidProductionReady=true`（`oneTimeProducts` 200）；ASC 消耗型+訂閱 Ready；**App 截圖 6/6** | 11 名真實 Gmail opt-in + 14 天；IPA（macOS）；Apple IAP 憑證；Production access 申請 |
 | LLM | mock/openai/anthropic/hybrid；compose `llama` profile（Ollama） | 生產 GPU 節點 |
-| IAP | Play API、JWS、冪等；`GET /v1/meta/iap-readiness`；Flutter/Web 自 `iap-products` 同步 SKU；Flutter 恢復購買；Web dev stub；`docs/STORE_IAP.md` | 生產商店憑證全開、App Store Connect / Play Console 商品上架 |
+| IAP | Play API、JWS、冪等；`GET /v1/meta/iap-readiness`（Render `androidProductionReady=true`）；Flutter/Web 自 `iap-products` 同步 SKU | Apple IAP 憑證、TestFlight IPA（macOS） |
 | Offerwall | HMAC + `OFFERWALL_ALLOWED_IPS` webhook；`GET /v1/meta/offerwall`；Web／Flutter 聊天與設定頁領幣 | 正式 SDK |
 
 ## 未開始（藍圖）

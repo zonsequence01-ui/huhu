@@ -1,4 +1,5 @@
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { generateKeyPairSync } from "node:crypto";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -9,6 +10,7 @@ import {
   playApiProbeUrls,
   probeGooglePlayApiAccess,
   probeGooglePlayCatalogAccess,
+  probeGooglePlayCatalogSkus,
   resolveGooglePlayServiceAccountPath,
 } from "./google-play-verify.js";
 
@@ -130,5 +132,58 @@ describe("google-play-verify", () => {
       httpStatus: 200,
       probeEndpoint: "oneTimeProducts",
     });
+  });
+
+  it("probeGooglePlayCatalogSkus reports missing SKUs", async () => {
+    const { privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+    const private_key = privateKey.export({ type: "pkcs8", format: "pem" });
+    process.env.GOOGLE_PLAY_PACKAGE_NAME = "com.ctrlz.huhu";
+    process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = JSON.stringify({
+      client_email: "sa@test.iam.gserviceaccount.com",
+      private_key,
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("oauth2.googleapis.com/token")) {
+          return new Response(JSON.stringify({ access_token: "tok" }), {
+            status: 200,
+          });
+        }
+        if (url.includes("/oneTimeProducts?pageSize=1")) {
+          return new Response("{}", { status: 200 });
+        }
+        if (url.includes("/oneTimeProducts?pageSize=50")) {
+          return new Response(
+            JSON.stringify({
+              oneTimeProducts: [{ productId: "com.ctrlz.huhu.coins.small" }],
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.includes("/subscriptions?maxResults=50")) {
+          return new Response(
+            JSON.stringify({
+              subscriptions: [{ productId: "com.ctrlz.huhu.sub.lite" }],
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response("{}", { status: 404 });
+      }),
+    );
+
+    const result = await probeGooglePlayCatalogSkus();
+    expect(result.catalogReady).toBe(false);
+    expect(result.missingOneTime).toEqual([
+      "com.ctrlz.huhu.coins.large",
+      "com.ctrlz.huhu.coins.medium",
+    ]);
+    expect(result.missingSubscriptions).toEqual([
+      "com.ctrlz.huhu.sub.basic",
+      "com.ctrlz.huhu.sub.premium",
+    ]);
   });
 });

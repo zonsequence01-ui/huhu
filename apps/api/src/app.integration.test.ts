@@ -1502,6 +1502,25 @@ describe("API integration", () => {
     expect(typeof body.probe.apiAccessOk).toBe("boolean");
   });
 
+  it("returns play-catalog-probe shape", async () => {
+    const res = await built.app.inject({
+      method: "GET",
+      url: "/v1/meta/play-catalog-probe",
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as {
+      catalog: {
+        configured: boolean;
+        expectedSubscriptions: string[];
+        expectedOneTime: string[];
+        catalogReady?: boolean;
+      };
+    };
+    expect(body.catalog.expectedSubscriptions.length).toBe(3);
+    expect(body.catalog.expectedOneTime.length).toBe(3);
+    expect(typeof body.catalog.configured).toBe("boolean");
+  });
+
   it("returns store listing ASO copy by market", async () => {
     const markets = await built.app.inject({
       method: "GET",

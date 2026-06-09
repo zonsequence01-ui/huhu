@@ -11,6 +11,10 @@ import {
   PLAY_INTERNAL_TRACK_ID,
   PLAY_OPT_IN_URL,
 } from "./play-console-ids.mjs";
+import {
+  fetchProdIapReadiness,
+  fetchProdPlayApiProbe,
+} from "./lib/render-prod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = join(root, "dist/play-closed-test");
@@ -18,6 +22,22 @@ const optInUrl = PLAY_OPT_IN_URL;
 const consoleBase = PLAY_CONSOLE_BASE;
 const closedAlphaTrackId = PLAY_ALPHA_TRACK_ID;
 const internalTrackId = PLAY_INTERNAL_TRACK_ID;
+
+const [iapProd, playProbe] = await Promise.all([
+  fetchProdIapReadiness(),
+  fetchProdPlayApiProbe(),
+]);
+
+const playApiStatus = playProbe?.apiAccessOk
+  ? "**已就緒** — `pnpm check:play-api` → `apiAccessOk=true`"
+  : playProbe?.oauthOk === false
+    ? "**OAuth 失敗** — 檢查 Render SA"
+    : "**待驗證** — `pnpm check:play-api`";
+
+const androidIapStatus =
+  iapProd?.androidProductionReady === true
+    ? "**androidProductionReady=true**（Render 生產 API）"
+    : "**待就緒** — `GET /v1/meta/iap-readiness`";
 
 const lines = [
   "# Google Play 封閉測試（Production access 前置）",
@@ -30,8 +50,9 @@ const lines = [
   "|------|------|",
   "| Alpha 版本 | **1.0.2 (3) 已發布**（2026-06-08）；edge-to-edge 修正 |",
   "| Opt-in 測試者 | **1 / 12**（Dashboard 實測）；名單「Test」含 1 位 |",
-  "| Play IAP API | **已就緒** — `pnpm check:play-api` → `apiAccessOk=true` |",
-  "| 意見回饋 URL | `https://huhu-app.pages.dev/support` ✓ |",
+  `| Play IAP API | ${playApiStatus} |`,
+  `| Android IAP（後端） | ${androidIapStatus} |`,
+  "| 意見回饋 URL | `https://huhu-app.pages.dev/support` — **已發布**（2026-06-09） |",
   "| 正式版權限：封閉測試 | ✓ |",
   "| 測試人員（需 **12** 名） | **手動更新** — 於 Console 查看 |",
   "| 連續測試期（需 **14** 天） | **手動更新** — 自 12 人 opt-in 起算 |",

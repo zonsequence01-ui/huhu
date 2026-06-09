@@ -36,6 +36,7 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 - [x] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
 - [x] Play Console **邀請 SA 使用者**（Users 2 位；呼呼 Huhu 4 項應用程式權限）
 - [x] `pnpm check:play-api` → `apiAccessOk=true`（Render `513942e`；probe=`oneTimeProducts`）
+- [ ] `pnpm check:play-catalog` → `catalogReady=true`（部署 `play-catalog-probe` 後驗證六檔 SKU）
 - [ ] 封閉測試驗證 `gp:<token>` 收據（Alpha 封測中；需 12 opt-in 測試者）
 
 ## 客戶端
@@ -48,6 +49,8 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 ## 上架前檢查
 
 - `GET /v1/meta/iap-readiness` — iOS/Android 驗證是否就緒（Android `configured` = Play API 完整；`packageName` 僅表示套件名已填）
+- `GET /v1/meta/play-catalog-probe` — Play Console 六檔 SKU 是否齊全（`catalogReady`）
+- `pnpm check:play-catalog` — 對 Render 生產 API 執行上述探測
 - `GET /health` — 同上，嵌於 `iap` 欄位
 - `pnpm check:iap` — CLI 檢查（需先 `pnpm build`；生產就緒時 exit 0）
 - `pnpm check:launch` — 彙總 listings／catalog 驗證 + PPP 對照 + IAP 狀態（見下方）

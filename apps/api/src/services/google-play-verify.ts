@@ -1,6 +1,11 @@
 import { createSign } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { IAP_PRODUCTS, subscriptionBonusCoins } from "./iap-products.js";
+import {
+  IAP_COIN_PRODUCT_IDS,
+  IAP_PRODUCTS,
+  IAP_SUBSCRIPTION_PRODUCT_IDS,
+  subscriptionBonusCoins,
+} from "./iap-products.js";
 import type { VerifyReceiptResult } from "./iap.js";
 
 interface ServiceAccount {
@@ -116,6 +121,24 @@ export type GooglePlayApiProbe = {
   reason?: string;
 };
 
+export type GooglePlayCatalogProbe = GooglePlayApiProbe & {
+  /** Expected Android subscription product IDs from catalog. */
+  expectedSubscriptions: string[];
+  /** Expected Android one-time (coin) product IDs from catalog. */
+  expectedOneTime: string[];
+  subscriptionProductIds?: string[];
+  oneTimeProductIds?: string[];
+  missingSubscriptions?: string[];
+  missingOneTime?: string[];
+  /** All expected Android SKUs present in Play Console. */
+  catalogReady?: boolean;
+};
+
+const EXPECTED_ANDROID_SUBSCRIPTIONS = Object.values(
+  IAP_SUBSCRIPTION_PRODUCT_IDS,
+);
+const EXPECTED_ANDROID_ONE_TIME = Object.values(IAP_COIN_PRODUCT_IDS);
+
 const PLAY_PUBLISHER_BASE =
   "https://androidpublisher.googleapis.com/androidpublisher/v3/applications";
 
@@ -205,6 +228,102 @@ export async function probeGooglePlayApiAccess(): Promise<GooglePlayApiProbe> {
     configured: true,
     oauthOk: true,
     ...catalog,
+  };
+}
+
+async function fetchPlayCatalogIds(
+  token: string,
+  packageName: string,
+): Promise<{
+  oneTimeProductIds: string[];
+  subscriptionProductIds: string[];
+}> {
+  const headers = { Authorization: `Bearer ${token}` };
+  const base = `${PLAY_PUBLISHER_BASE}/${encodeURIComponent(packageName)}`;
+  const oneTimeProductIds: string[] = [];
+  const subscriptionProductIds: string[] = [];
+
+  const oneTimeRes = await fetch(
+    `${base}/oneTimeProducts?pageSize=50`,
+    { headers },
+  );
+  if (oneTimeRes.ok) {
+    const data = (await oneTimeRes.json()) as {
+      oneTimeProducts?: Array<{ productId?: string }>;
+    };
+    for (const item of data.oneTimeProducts ?? []) {
+      if (item.productId) oneTimeProductIds.push(item.productId);
+    }
+  }
+
+  const subRes = await fetch(`${base}/subscriptions?maxResults=50`, {
+    headers,
+  });
+  if (subRes.ok) {
+    const data = (await subRes.json()) as {
+      subscriptions?: Array<{ productId?: string }>;
+    };
+    for (const item of data.subscriptions ?? []) {
+      if (item.productId) subscriptionProductIds.push(item.productId);
+    }
+  }
+
+  return {
+    oneTimeProductIds: oneTimeProductIds.sort(),
+    subscriptionProductIds: subscriptionProductIds.sort(),
+  };
+}
+
+function diffExpected(found: string[], expected: string[]): string[] {
+  const set = new Set(found);
+  return expected.filter((id) => !set.has(id)).sort();
+}
+
+/** Lists Play Console SKUs and compares to expected Android catalog. */
+export async function probeGooglePlayCatalogSkus(): Promise<GooglePlayCatalogProbe> {
+  const base: GooglePlayCatalogProbe = {
+    expectedSubscriptions: EXPECTED_ANDROID_SUBSCRIPTIONS,
+    expectedOneTime: EXPECTED_ANDROID_ONE_TIME,
+    configured: false,
+    oauthOk: false,
+    apiAccessOk: false,
+  };
+
+  const pkg = process.env.GOOGLE_PLAY_PACKAGE_NAME?.trim();
+  const sa = parseServiceAccount();
+  if (!pkg || !sa) {
+    return { ...base, catalogReady: false, reason: "not_configured" };
+  }
+  base.configured = true;
+
+  const token = await getAccessToken(sa);
+  if (!token) {
+    return { ...base, catalogReady: false, reason: "oauth_failed" };
+  }
+  base.oauthOk = true;
+
+  const catalog = await probeGooglePlayCatalogAccess(token, pkg);
+  Object.assign(base, catalog);
+  if (!catalog.apiAccessOk) {
+    return { ...base, catalogReady: false };
+  }
+
+  const { oneTimeProductIds, subscriptionProductIds } =
+    await fetchPlayCatalogIds(token, pkg);
+  const missingOneTime = diffExpected(oneTimeProductIds, EXPECTED_ANDROID_ONE_TIME);
+  const missingSubscriptions = diffExpected(
+    subscriptionProductIds,
+    EXPECTED_ANDROID_SUBSCRIPTIONS,
+  );
+
+  return {
+    ...base,
+    oneTimeProductIds,
+    subscriptionProductIds,
+    missingOneTime,
+    missingSubscriptions,
+    catalogReady:
+      missingOneTime.length === 0 && missingSubscriptions.length === 0,
   };
 }
 

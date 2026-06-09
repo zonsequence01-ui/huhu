@@ -419,6 +419,13 @@ export async function buildApp(options: AppOptions = {}) {
     return { probe: await probeGooglePlayApiAccess() };
   });
 
+  app.get("/v1/meta/play-catalog-probe", async () => {
+    const { probeGooglePlayCatalogSkus } = await import(
+      "./services/google-play-verify.js"
+    );
+    return { catalog: await probeGooglePlayCatalogSkus() };
+  });
+
   app.get("/v1/meta/economy", async () => ({
     economy: getEconomyMeta(),
   }));

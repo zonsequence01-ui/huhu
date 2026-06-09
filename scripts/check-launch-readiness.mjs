@@ -12,6 +12,7 @@ import {
   getPricing,
   SUBSCRIPTION_PRICES_USD,
 } from "@huhu/shared";
+import { fetchProdIapReadiness, renderApiBase } from "./lib/render-prod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -113,6 +114,15 @@ try {
     console.log(
       "  → Set IAP_STRICT + store credentials; see docs/STORE_IAP.md",
     );
+  }
+  const prod = await fetchProdIapReadiness(renderApiBase());
+  if (prod) {
+    console.log(
+      `Render production: androidProductionReady=${prod.androidProductionReady ?? false} iosProductionReady=${prod.iosProductionReady ?? false} playApi=${prod.android?.playApi ?? false}`,
+    );
+    if (prod.androidProductionReady && !r.androidProductionReady) {
+      console.log("  → Local env lacks Play SA; production Android IAP is ready");
+    }
   }
 } catch {
   console.log("\n--- IAP ---");

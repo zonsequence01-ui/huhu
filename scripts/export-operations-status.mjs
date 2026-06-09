@@ -14,19 +14,28 @@ import {
   STORE_SUPPORT_URL,
   SUBSCRIPTION_PRICES_USD,
 } from "@huhu/shared";
+import {
+  fetchProdIapReadiness,
+  fetchProdPlayApiProbe,
+  renderApiBase,
+} from "./lib/render-prod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const out = join(root, "dist/OPERATIONS_STATUS.md");
+const renderBase = renderApiBase();
 
-let iap = { productionReady: false, strict: false };
+let iapLocal = { productionReady: false, strict: false };
 try {
   const mod = await import(
     pathToFileURL(join(root, "apps/api/dist/services/iap-readiness.js")).href
   );
-  iap = mod.getIapReadiness();
+  iapLocal = mod.getIapReadiness();
 } catch {
   /* build first */
 }
+
+const iapProd = await fetchProdIapReadiness(renderBase);
+const iap = iapProd ?? iapLocal;
 
 const usd = getUsdBaseline();
 const launchManifest = existsSync(join(root, "dist/launch-bundle/manifest.json"))
@@ -78,16 +87,9 @@ const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe] =
     }
   })(),
   (async () => {
-    try {
-      const res = await fetch("https://huhu-api.onrender.com/v1/meta/play-api-probe", {
-        signal: AbortSignal.timeout(45_000),
-      });
-      if (!res.ok) return `HTTP ${res.status}`;
-      const { probe } = await res.json();
-      return `oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.probeEndpoint ? ` endpoint=${probe.probeEndpoint}` : ""}`;
-    } catch {
-      return "unreachable";
-    }
+    const probe = await fetchProdPlayApiProbe(renderBase);
+    if (!probe) return "unreachable";
+    return `oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.probeEndpoint ? ` endpoint=${probe.probeEndpoint}` : ""}`;
   })(),
 ]);
 const prodSite = healthStatus === "200" ? "up" : healthStatus;
@@ -139,12 +141,20 @@ const lines = [
   "",
   "## IAP readiness",
   "",
+  iapProd
+    ? `- source: **production** (\`${renderBase}/v1/meta/iap-readiness\`)`
+    : "- source: **local env** (production API unreachable; run `pnpm check:render`)",
   `- productionReady: **${iap.productionReady}**`,
   `- androidProductionReady: **${iap.androidProductionReady ?? false}**`,
   `- iosProductionReady: **${iap.iosProductionReady ?? false}**`,
   `- IAP_STRICT: ${iap.strict}`,
   `- iOS configured: ${iap.ios?.configured ?? false}`,
   `- Android playApi: ${iap.android?.playApi ?? false}`,
+  ...(iapProd && iapLocal.androidProductionReady !== iapProd.androidProductionReady
+    ? [
+        `- local env androidProductionReady: ${iapLocal.androidProductionReady ?? false} (differs from production)`,
+      ]
+    : []),
   "",
   "## Blueprint pricing (US baseline)",
   "",

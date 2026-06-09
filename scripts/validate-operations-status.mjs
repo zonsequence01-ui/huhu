@@ -22,6 +22,7 @@ const required = [
   "## IAP readiness",
   "productionReady:",
   "androidProductionReady:",
+  "source: **",
   "Play API probe:",
   "pnpm check:play-api",
   "privacy:",

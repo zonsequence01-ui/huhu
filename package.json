@@ -76,6 +76,7 @@
     "health:prod-stack": "node scripts/health-prod-stack.mjs",
     "check:render": "node scripts/check-render-api.mjs",
     "check:play-api": "node scripts/check-play-api-probe.mjs",
+    "check:play-catalog": "node scripts/check-play-catalog.mjs",
     "push:github": "node scripts/push-github.mjs",
     "push:ci": "node scripts/push-ci-with-env.mjs",
     "ship:android": "pnpm build:android && pnpm package:android-release && pnpm validate:android-release",

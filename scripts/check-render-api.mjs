@@ -72,6 +72,21 @@ async function main() {
                     );
                   }
                 }
+                try {
+                  const catRes = await fetch(`${base}/v1/meta/play-catalog-probe`, {
+                    signal: AbortSignal.timeout(60_000),
+                  });
+                  if (catRes.status === 404) {
+                    console.log("  play-catalog-probe: not deployed (push latest API)");
+                  } else if (catRes.ok) {
+                    const { catalog: cat } = await catRes.json();
+                    console.log(
+                      `  play-catalog-probe: catalogReady=${cat.catalogReady ?? false}${cat.missingOneTime?.length ? ` missingCoins=${cat.missingOneTime.length}` : ""}${cat.missingSubscriptions?.length ? ` missingSubs=${cat.missingSubscriptions.length}` : ""}`,
+                    );
+                  }
+                } catch {
+                  console.log("  play-catalog-probe: skipped (timeout)");
+                }
               } catch {
                 console.log("  play-api-probe: skipped (timeout)");
               }
