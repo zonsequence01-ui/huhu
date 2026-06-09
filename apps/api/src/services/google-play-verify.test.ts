@@ -6,7 +6,9 @@ import {
   GOOGLE_PLAY_SA_DEFAULT_SECRET_PATH,
   isGooglePlayApiConfigured,
   parseGooglePlayReceipt,
+  playApiProbeUrls,
   probeGooglePlayApiAccess,
+  probeGooglePlayCatalogAccess,
   resolveGooglePlayServiceAccountPath,
 } from "./google-play-verify.js";
 
@@ -75,6 +77,58 @@ describe("google-play-verify", () => {
       oauthOk: false,
       apiAccessOk: false,
       reason: "not_configured",
+    });
+  });
+
+  it("playApiProbeUrls prefers oneTimeProducts then legacy catalog", () => {
+    const urls = playApiProbeUrls("com.ctrlz.huhu");
+    expect(urls[0]).toContain("/oneTimeProducts?pageSize=1");
+    expect(urls[1]).toContain("/inappproducts?maxResults=1");
+    expect(urls[2]).toContain("/subscriptions?maxResults=1");
+  });
+
+  it("probeGooglePlayCatalogAccess falls through to legacy inappproducts", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/oneTimeProducts")) {
+          return new Response("{}", { status: 403 });
+        }
+        if (url.includes("/inappproducts")) {
+          return new Response("{}", { status: 200 });
+        }
+        return new Response("{}", { status: 404 });
+      }),
+    );
+
+    await expect(
+      probeGooglePlayCatalogAccess("tok", "com.ctrlz.huhu"),
+    ).resolves.toEqual({
+      apiAccessOk: true,
+      httpStatus: 200,
+      probeEndpoint: "inappproducts",
+    });
+  });
+
+  it("probeGooglePlayCatalogAccess prefers oneTimeProducts when available", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        if (url.includes("/oneTimeProducts")) {
+          return new Response("{}", { status: 200 });
+        }
+        return new Response("{}", { status: 403 });
+      }),
+    );
+
+    await expect(
+      probeGooglePlayCatalogAccess("tok", "com.ctrlz.huhu"),
+    ).resolves.toEqual({
+      apiAccessOk: true,
+      httpStatus: 200,
+      probeEndpoint: "oneTimeProducts",
     });
   });
 });

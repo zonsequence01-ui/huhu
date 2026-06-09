@@ -111,10 +111,73 @@ export type GooglePlayApiProbe = {
   oauthOk: boolean;
   apiAccessOk: boolean;
   httpStatus?: number;
+  /** Endpoint that succeeded (e.g. oneTimeProducts). */
+  probeEndpoint?: string;
   reason?: string;
 };
 
-/** Verifies SA OAuth and Play Console API access (Grant access). */
+const PLAY_PUBLISHER_BASE =
+  "https://androidpublisher.googleapis.com/androidpublisher/v3/applications";
+
+/** Catalog probes — any 2xx proves Play Console user invite + API access. */
+export function playApiProbeUrls(packageName: string): string[] {
+  const pkg = encodeURIComponent(packageName);
+  const base = `${PLAY_PUBLISHER_BASE}/${pkg}`;
+  return [
+    `${base}/oneTimeProducts?pageSize=1`,
+    `${base}/inappproducts?maxResults=1`,
+    `${base}/subscriptions?maxResults=1`,
+  ];
+}
+
+function probeEndpointName(url: string): string {
+  if (url.includes("/oneTimeProducts")) return "oneTimeProducts";
+  if (url.includes("/inappproducts")) return "inappproducts";
+  return "subscriptions";
+}
+
+/** Tries catalog list endpoints until one returns 2xx (used by probe + tests). */
+export async function probeGooglePlayCatalogAccess(
+  token: string,
+  packageName: string,
+): Promise<
+  Pick<
+    GooglePlayApiProbe,
+    "apiAccessOk" | "httpStatus" | "probeEndpoint" | "reason"
+  >
+> {
+  const headers = { Authorization: `Bearer ${token}` };
+  let lastStatus: number | undefined;
+  let saw403 = false;
+
+  for (const url of playApiProbeUrls(packageName)) {
+    const res = await fetch(url, { headers });
+    if (res.ok) {
+      return {
+        apiAccessOk: true,
+        httpStatus: res.status,
+        probeEndpoint: probeEndpointName(url),
+      };
+    }
+    lastStatus = res.status;
+    if (res.status === 403) saw403 = true;
+  }
+
+  if (saw403) {
+    return {
+      apiAccessOk: false,
+      httpStatus: lastStatus ?? 403,
+      reason: "play_console_grant_access_required",
+    };
+  }
+  return {
+    apiAccessOk: false,
+    httpStatus: lastStatus,
+    reason: "api_error",
+  };
+}
+
+/** Verifies SA OAuth and Play Console API access (Invite user). */
 export async function probeGooglePlayApiAccess(): Promise<GooglePlayApiProbe> {
   const pkg = process.env.GOOGLE_PLAY_PACKAGE_NAME?.trim();
   const sa = parseServiceAccount();
@@ -137,33 +200,11 @@ export async function probeGooglePlayApiAccess(): Promise<GooglePlayApiProbe> {
     };
   }
 
-  const url = `${`https://androidpublisher.googleapis.com/androidpublisher/v3/applications/${encodeURIComponent(pkg)}`}/inappproducts?maxResults=1`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (res.ok) {
-    return {
-      configured: true,
-      oauthOk: true,
-      apiAccessOk: true,
-      httpStatus: res.status,
-    };
-  }
-  if (res.status === 403) {
-    return {
-      configured: true,
-      oauthOk: true,
-      apiAccessOk: false,
-      httpStatus: 403,
-      reason: "play_console_grant_access_required",
-    };
-  }
+  const catalog = await probeGooglePlayCatalogAccess(token, pkg);
   return {
     configured: true,
     oauthOk: true,
-    apiAccessOk: false,
-    httpStatus: res.status,
-    reason: "api_error",
+    ...catalog,
   };
 }
 

@@ -64,7 +64,7 @@ async function main() {
                 if (probeRes.ok) {
                   const { probe } = await probeRes.json();
                   console.log(
-                    `  play-api-probe: oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.reason ? ` (${probe.reason})` : ""}`,
+                    `  play-api-probe: oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.probeEndpoint ? ` endpoint=${probe.probeEndpoint}` : ""}${probe.reason ? ` (${probe.reason})` : ""}`,
                   );
                   if (probe.oauthOk && !probe.apiAccessOk) {
                     console.log(

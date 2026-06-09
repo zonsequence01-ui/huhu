@@ -1,5 +1,5 @@
 /**
- * Probe Render Play Developer API access (OAuth + Grant access).
+ * Probe Render Play Developer API access (OAuth + Play Console user invite).
  * Usage: pnpm check:play-api
  * Env: RENDER_API_URL (default https://huhu-api.onrender.com)
  */
@@ -24,6 +24,7 @@ async function main() {
   console.log(`oauthOk: ${probe.oauthOk}`);
   console.log(`apiAccessOk: ${probe.apiAccessOk}`);
   if (probe.httpStatus) console.log(`httpStatus: ${probe.httpStatus}`);
+  if (probe.probeEndpoint) console.log(`probeEndpoint: ${probe.probeEndpoint}`);
   if (probe.reason) console.log(`reason: ${probe.reason}`);
 
   if (!probe.configured) {
@@ -36,9 +37,16 @@ async function main() {
   }
   if (!probe.apiAccessOk) {
     console.log(
-      "\n→ Play Console → Users and permissions → API access → Grant access",
+      "\n→ Play Console → Users and permissions → Invite user",
+    );
+    console.log(
+      "  https://play.google.com/console/u/0/developers/8174397007390615775/users-and-permissions/invite",
     );
     console.log("  SA: huhu-play-iap@gen-lang-client-0985302942.iam.gserviceaccount.com");
+    console.log(
+      "  App 呼呼 Huhu: 查看應用程式資訊 + 查看財務資料 + 管理訂單和訂閱",
+    );
+    console.log("  Details: pnpm export:play-api-setup");
     process.exit(1);
   }
 

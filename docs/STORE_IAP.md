@@ -34,7 +34,8 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 - [x] SKU 六檔已啟用（訂閱 lite/basic/premium + 幣包 small/medium/large，173 國）
 - [ ] **12 名 opt-in 測試者 × 14 天**（目前 1/12）
 - [x] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
-- [ ] Play Console **Grant access** 授權 SA（`pnpm check:play-api`）
+- [x] Play Console **邀請 SA 使用者**（Users 2 位；呼呼 Huhu 4 項應用程式權限）
+- [ ] `pnpm check:play-api` → `apiAccessOk=true`（probe 已改為 `oneTimeProducts` 優先；需 **部署 API** 後再驗證）
 - [ ] 封閉測試驗證 `gp:<token>` 收據（需 apiAccessOk）
 
 ## 客戶端

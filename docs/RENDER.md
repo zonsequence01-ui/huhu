@@ -17,7 +17,7 @@
 
 ```bash
 pnpm check:render
-pnpm check:play-api          # OAuth + Play Console Grant access（部署後）
+pnpm check:play-api          # OAuth + Play Console SA 邀請（部署後）
 CHECK_SITE_REQUIRE_HEALTH=1 pnpm check:site
 pnpm smoke:api:prod
 ```
@@ -49,7 +49,7 @@ pnpm smoke:api:prod
 | 環境變數 | `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` 或 `GOOGLE_PLAY_SERVICE_ACCOUNT_PATH` |
 | 嚴格模式 | `IAP_STRICT=true`（需 iOS + Play API 憑證齊全） |
 
-`GET /v1/meta/play-api-probe` — 驗證 SA OAuth 與 Play Console **Grant access**（`apiAccessOk`）。
+`GET /v1/meta/play-api-probe` — 驗證 SA OAuth 與 Play Console **使用者邀請**（`apiAccessOk`；依序探測 `oneTimeProducts` / `inappproducts` / `subscriptions`）。
 
 詳見 `pnpm export:play-api-setup` → `dist/play-api-setup/README.md`。
 
