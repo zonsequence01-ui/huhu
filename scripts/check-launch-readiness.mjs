@@ -123,7 +123,7 @@ try {
     const catalog = await fetchProdPlayCatalogProbe(renderApiBase());
     if (catalog) {
       console.log(
-        `Render play catalog: catalogReady=${catalog.catalogReady ?? false} (subs=${catalog.subscriptions?.length ?? 0} coins=${catalog.oneTime?.length ?? 0})`,
+        `Render play catalog: catalogReady=${catalog.catalogReady ?? false} (subs=${catalog.subscriptionProductIds?.length ?? 0} coins=${catalog.oneTimeProductIds?.length ?? 0})`,
       );
     }
     if (prod.androidProductionReady && !r.androidProductionReady) {

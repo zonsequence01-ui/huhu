@@ -95,8 +95,8 @@ const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe, p
   (async () => {
     const cat = await fetchProdPlayCatalogProbe(renderBase);
     if (!cat) return "unreachable";
-    const subs = cat.subscriptions?.length ?? 0;
-    const coins = cat.oneTime?.length ?? 0;
+    const subs = cat.subscriptionProductIds?.length ?? 0;
+    const coins = cat.oneTimeProductIds?.length ?? 0;
     return `catalogReady=${cat.catalogReady ?? false} subs=${subs} coins=${coins}`;
   })(),
 ]);
