@@ -86,7 +86,7 @@ describe("google-play-verify", () => {
     const urls = playApiProbeUrls("com.ctrlz.huhu");
     expect(urls[0]).toContain("/oneTimeProducts?pageSize=1");
     expect(urls[1]).toContain("/inappproducts?maxResults=1");
-    expect(urls[2]).toContain("/subscriptions?maxResults=1");
+    expect(urls[2]).toContain("/subscriptions?pageSize=1");
   });
 
   it("probeGooglePlayCatalogAccess falls through to legacy inappproducts", async () => {
@@ -164,6 +164,14 @@ describe("google-play-verify", () => {
           );
         }
         if (url.includes("/subscriptions?maxResults=50")) {
+          return new Response(
+            JSON.stringify({
+              subscriptions: [{ productId: "com.ctrlz.huhu.sub.lite" }],
+            }),
+            { status: 200 },
+          );
+        }
+        if (url.includes("/subscriptions?pageSize=50")) {
           return new Response(
             JSON.stringify({
               subscriptions: [{ productId: "com.ctrlz.huhu.sub.lite" }],

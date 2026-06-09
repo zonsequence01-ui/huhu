@@ -149,7 +149,7 @@ export function playApiProbeUrls(packageName: string): string[] {
   return [
     `${base}/oneTimeProducts?pageSize=1`,
     `${base}/inappproducts?maxResults=1`,
-    `${base}/subscriptions?maxResults=1`,
+    `${base}/subscriptions?pageSize=1`,
   ];
 }
 
@@ -256,15 +256,50 @@ async function fetchPlayCatalogIds(
     }
   }
 
-  const subRes = await fetch(`${base}/subscriptions?maxResults=50`, {
+  const subRes = await fetch(`${base}/subscriptions?pageSize=50`, {
     headers,
   });
   if (subRes.ok) {
     const data = (await subRes.json()) as {
       subscriptions?: Array<{ productId?: string }>;
+      nextPageToken?: string;
     };
     for (const item of data.subscriptions ?? []) {
       if (item.productId) subscriptionProductIds.push(item.productId);
+    }
+    // Paginate when more than one page of subscriptions.
+    let pageToken = data.nextPageToken;
+    while (pageToken) {
+      const nextRes = await fetch(
+        `${base}/subscriptions?pageSize=50&pageToken=${encodeURIComponent(pageToken)}`,
+        { headers },
+      );
+      if (!nextRes.ok) break;
+      const nextData = (await nextRes.json()) as {
+        subscriptions?: Array<{ productId?: string }>;
+        nextPageToken?: string;
+      };
+      for (const item of nextData.subscriptions ?? []) {
+        if (item.productId) subscriptionProductIds.push(item.productId);
+      }
+      pageToken = nextData.nextPageToken;
+    }
+  } else {
+    // Fallback: batch-get expected subscription IDs (list param mismatch on some API versions).
+    const params = new URLSearchParams();
+    for (const id of EXPECTED_ANDROID_SUBSCRIPTIONS) {
+      params.append("productIds", id);
+    }
+    const batchRes = await fetch(`${base}/subscriptions:batchGet?${params}`, {
+      headers,
+    });
+    if (batchRes.ok) {
+      const batch = (await batchRes.json()) as {
+        subscriptions?: Array<{ productId?: string }>;
+      };
+      for (const item of batch.subscriptions ?? []) {
+        if (item.productId) subscriptionProductIds.push(item.productId);
+      }
     }
   }
 
