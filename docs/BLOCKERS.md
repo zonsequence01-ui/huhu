@@ -12,7 +12,7 @@
 
 | **Phase 2 生產 API（持久）** | **已驗證**：`https://huhu-api.onrender.com/health` → `database: postgres`、`vectorStore: pgvector`。Render `DATABASE_URL` → Neon `huhu`；Blueprint `sync: false` 防覆寫 | `pnpm check:render` |
 
-| App Store / Play 正式 IAP SKU | Play：**1.0.2 (3) Alpha 已發布**。Opt-in **1/12**。Render：`playApi=true` `strict=true`。**SA 邀請已完成**；IAP 說明已儲存觸發傳播。程式碼已修正 probe（`oneTimeProducts` → `inappproducts` → `subscriptions`），**待部署 Render** 後 `pnpm check:play-api`。App Store：**缺 Build/IPA**（需 macOS） | `pnpm check:play-api`；push `main` 觸發 Render |
+| App Store / Play 正式 IAP SKU | Play：**1.0.2 (3) Alpha 已發布**。Opt-in **1/12**。Render：`513942e`；`androidProductionReady=true`（Play API 驗證通過）。App Store：**缺 Build/IPA**（需 macOS）；全平台 `productionReady=false` 待 Apple IAP | `pnpm check:play-api`；`pnpm check:render` |
 
 | 商店截圖與文案上傳 | **六市場 PNG 已產出**；ASC tw **6/6**；Play tw listing 完整 | `pnpm validate:store-upload` |
 

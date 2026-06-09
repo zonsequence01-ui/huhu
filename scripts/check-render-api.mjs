@@ -50,7 +50,7 @@ async function main() {
             const iap = await iapRes.json();
             const r = iap.readiness ?? iap;
             console.log(
-              `  iap-readiness: productionReady=${r.productionReady} strict=${r.strict} playApi=${r.android?.playApi ?? false}`,
+              `  iap-readiness: productionReady=${r.productionReady} androidReady=${r.androidProductionReady ?? false} iosReady=${r.iosProductionReady ?? false} strict=${r.strict} playApi=${r.android?.playApi ?? false}`,
             );
             if (r.android?.playApi === false) {
               console.log(

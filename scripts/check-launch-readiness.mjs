@@ -101,6 +101,9 @@ try {
   console.log("\n--- IAP ---");
   console.log(`productionReady: ${r.productionReady}`);
   console.log(
+    `androidProductionReady: ${r.androidProductionReady ?? false} / iosProductionReady: ${r.iosProductionReady ?? false}`,
+  );
+  console.log(
     `iOS: ${r.ios.configured} (legacy=${r.ios.legacyReceipt}, jws=${r.ios.appStoreJws})`,
   );
   console.log(

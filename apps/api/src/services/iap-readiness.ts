@@ -10,6 +10,10 @@ export type IapReadiness = {
   mockDevAllowed: boolean;
   /** True when IAP_STRICT and real iOS + Play API verification are configured. */
   productionReady: boolean;
+  /** IAP_STRICT + Play API in production (Android-only gate). */
+  androidProductionReady: boolean;
+  /** IAP_STRICT + Apple store credentials in production. */
+  iosProductionReady: boolean;
   ios: {
     configured: boolean;
     legacyReceipt: boolean;
@@ -37,12 +41,16 @@ export function getIapReadiness(): IapReadiness {
 
   const strict = process.env.IAP_STRICT === "true";
   const iosConfigured = isStoreVerificationConfigured("ios");
-  const productionReady =
-    strict && iosConfigured && playApi && process.env.NODE_ENV === "production";
+  const inProduction = process.env.NODE_ENV === "production";
+  const androidProductionReady = strict && playApi && inProduction;
+  const iosProductionReady = strict && iosConfigured && inProduction;
+  const productionReady = androidProductionReady && iosProductionReady;
 
   return {
     strict,
     productionReady,
+    androidProductionReady,
+    iosProductionReady,
     mockDevAllowed:
       process.env.MOCK_IAP === "1" ||
       process.env.NODE_ENV !== "production",

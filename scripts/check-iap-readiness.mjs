@@ -22,6 +22,8 @@ const lines = [
   `IAP_STRICT=${r.strict}`,
   `mockDevAllowed=${r.mockDevAllowed}`,
   `productionReady=${r.productionReady}`,
+  `androidProductionReady=${r.androidProductionReady ?? false}`,
+  `iosProductionReady=${r.iosProductionReady ?? false}`,
   `iOS configured=${r.ios.configured} (legacy=${r.ios.legacyReceipt}, jws=${r.ios.appStoreJws})`,
   `Android configured=${r.android.configured} (playApi=${r.android.playApi}, packageName=${r.android.packageName}, stub=${r.android.stub})`,
 ];
@@ -29,8 +31,8 @@ const lines = [
 if (!r.productionReady) {
   const missing = [];
   if (!r.strict) missing.push("IAP_STRICT=true");
-  if (!r.ios.configured) missing.push("Apple credentials");
-  if (!r.android.playApi) {
+  if (!r.iosProductionReady) missing.push("Apple credentials (iOS)");
+  if (!r.androidProductionReady) {
     missing.push(
       "GOOGLE_PLAY_PACKAGE_NAME + SA (Secret File or GOOGLE_PLAY_SERVICE_ACCOUNT_JSON)",
     );

@@ -34,4 +34,23 @@ describe("iap-readiness", () => {
     expect(getIapReadiness().android.playApi).toBe(true);
     expect(getIapReadiness().android.configured).toBe(true);
   });
+
+  it("splits platform production readiness", () => {
+    process.env.NODE_ENV = "production";
+    process.env.IAP_STRICT = "true";
+    process.env.GOOGLE_PLAY_PACKAGE_NAME = "com.ctrlz.huhu";
+    process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON = JSON.stringify({
+      client_email: "svc@test.iam.gserviceaccount.com",
+      private_key: "-----BEGIN PRIVATE KEY-----\nMII=\n-----END PRIVATE KEY-----\n",
+    });
+    const r = getIapReadiness();
+    expect(r.androidProductionReady).toBe(true);
+    expect(r.iosProductionReady).toBe(false);
+    expect(r.productionReady).toBe(false);
+
+    process.env.APPLE_IAP_SHARED_SECRET = "secret";
+    const both = getIapReadiness();
+    expect(both.iosProductionReady).toBe(true);
+    expect(both.productionReady).toBe(true);
+  });
 });

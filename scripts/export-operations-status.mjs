@@ -61,7 +61,7 @@ async function fetchStatus(url) {
   }
 }
 
-const [privacyStatus, supportStatus, healthStatus, renderHealth] = await Promise.all([
+const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe] = await Promise.all([
   fetchStatus(STORE_PRIVACY_URL),
   fetchStatus(STORE_SUPPORT_URL),
   fetchStatus(`${siteBase}/health`),
@@ -73,6 +73,18 @@ const [privacyStatus, supportStatus, healthStatus, renderHealth] = await Promise
       if (!res.ok) return `HTTP ${res.status}`;
       const body = await res.json();
       return `database=${body.database ?? "?"} vectorStore=${body.vectorStore ?? "?"}`;
+    } catch {
+      return "unreachable";
+    }
+  })(),
+  (async () => {
+    try {
+      const res = await fetch("https://huhu-api.onrender.com/v1/meta/play-api-probe", {
+        signal: AbortSignal.timeout(45_000),
+      });
+      if (!res.ok) return `HTTP ${res.status}`;
+      const { probe } = await res.json();
+      return `oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.probeEndpoint ? ` endpoint=${probe.probeEndpoint}` : ""}`;
     } catch {
       return "unreachable";
     }
@@ -93,6 +105,7 @@ const lines = [
   `- support: **${supportStatus}**`,
   `- /health: **${prodSite}**`,
   `- Render API: **${renderHealth}** (\`pnpm check:render\`)`,
+  `- Play API probe: **${playApiProbe}** (\`pnpm check:play-api\`)`,
   `- check: \`pnpm check:site\` (blocks Play/ASC until privacy 200)`,
   `- verify: \`pnpm smoke:api:prod\` (uses PROD_SMOKE_URL to override)`,
   `- deploy: \`pnpm export:deploy-bundle\` → \`deploy-remote-static.example.sh\` (Phase 1)`,
@@ -127,6 +140,8 @@ const lines = [
   "## IAP readiness",
   "",
   `- productionReady: **${iap.productionReady}**`,
+  `- androidProductionReady: **${iap.androidProductionReady ?? false}**`,
+  `- iosProductionReady: **${iap.iosProductionReady ?? false}**`,
   `- IAP_STRICT: ${iap.strict}`,
   `- iOS configured: ${iap.ios?.configured ?? false}`,
   `- Android playApi: ${iap.android?.playApi ?? false}`,
@@ -144,6 +159,13 @@ const lines = [
   existsSync(join(root, "dist/store-upload/tw/app-store-captioned/01-chat.png"))
     ? "- store-upload: present"
     : "- store-upload: run `pnpm package:store-upload`",
+  existsSync(join(root, "dist/play-closed-test/README.md"))
+    ? [
+        "- play closed test: `dist/play-closed-test/README.md`",
+        "- opt-in: https://play.google.com/apps/testing/com.ctrlz.huhu",
+        "- gate: **12** opted-in testers × **14** days (manual; see README)",
+      ].join("\n")
+    : "- play closed test: run `pnpm export:play-closed-test`",
   "",
   "## Repo commands",
   "",
