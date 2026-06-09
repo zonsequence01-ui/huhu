@@ -35,7 +35,7 @@
 | 動態 | 公開／好友／私人 visibility；邀請碼／連結／QR、封鎖、暱稱搜尋 API+Web/Flutter；`/admin.html` 營運頁 | — |
 | 多語系 | 預設角色依 locale、`zh-CN` ASO+CNY PPP、`vi-VN` 完整 UI；`localeHint` + `relationshipStageBehavior` + `stageLabelForLocale`（API/UI 關係標籤） | 需生產級模型微調／GPU |
 | ASO | 同上 + `compose:aso-screenshots`（標題疊加）+ `validate:store-upload`（含 captioned 子資料夾）；`pnpm check:launch` | 手動上傳 `dist/store-upload/*`（建議 `*-captioned/`） |
-| IAP 營運 | Play **Alpha 1.0.2 (3) 已發布**；意見回饋 URL **已發布**；Opt-in **1/12**；Render `androidProductionReady=true` + `catalogReady=true`（`200218f`）；ASC 消耗型+訂閱 Ready；**App 截圖 6/6** | 11 名真實 Gmail opt-in + 14 天；IPA（macOS）；Apple IAP 憑證；Production access 申請 |
+| IAP 營運 | Play **Alpha 1.0.2 (3) 已發布**；Opt-in **1/12**（`zon.sequence01@gmail.com`）；Alpha **4 國**（TW/JP/KR/CN）；`catalogReady=true` | 11 名真實 Gmail opt-in + 14 天；IPA（macOS）；Apple IAP 憑證 |
 | LLM | mock/openai/anthropic/hybrid；compose `llama` profile（Ollama） | 生產 GPU 節點 |
 | IAP | Play API、JWS、冪等；`GET /v1/meta/iap-readiness`（Render `androidProductionReady=true`）；Flutter/Web 自 `iap-products` 同步 SKU | Apple IAP 憑證、TestFlight IPA（macOS） |
 | Offerwall | HMAC + `OFFERWALL_ALLOWED_IPS` webhook；`GET /v1/meta/offerwall`；Web／Flutter 聊天與設定頁領幣 | 正式 SDK |

@@ -12,7 +12,7 @@
 
 | **Phase 2 生產 API（持久）** | **已驗證**：`https://huhu-api.onrender.com/health` → `database: postgres`、`vectorStore: pgvector`。Render `DATABASE_URL` → Neon `huhu`；Blueprint `sync: false` 防覆寫 | `pnpm check:render` |
 
-| App Store / Play 正式 IAP SKU | Play：**1.0.2 (3) Alpha 已發布**；Alpha 意見回饋 URL **已發布**（2026-06-09）。Opt-in **1/12**（尚需 11 名真實 Gmail + 14 天）。Render：`200218f`；`androidProductionReady=true`；`catalogReady=true`（3 訂閱 + 3 幣包）。App Store：**缺 Build/IPA**（需 macOS）；全平台 `productionReady=false` 待 Apple IAP | `pnpm check:play-api`；`pnpm check:play-catalog`；`pnpm check:render` |
+| App Store / Play 正式 IAP SKU | Play：**1.0.2 (3) Alpha 已發布**；Alpha 意見回饋 URL **已發布**。Opt-in **1/12**（Dashboard 2026-06-09 實測；名單僅 `zon.sequence01@gmail.com`）。Alpha 測試國家 **4**（台灣、日本、南韓、中國）。Render：`catalogReady=true` + `androidProductionReady=true`。App Store：**無 Build**（TestFlight 空；需 macOS IPA）；ASC 審核電話已更正 | `pnpm check:play-catalog`；Play Dashboard |
 
 | 商店截圖與文案上傳 | **六市場 PNG 已產出**；ASC tw **6/6**；Play tw listing 完整 | `pnpm validate:store-upload` |
 

@@ -19,7 +19,7 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 - [x] 訂閱群組 `huhu_membership` 三檔已建；**群組 zh-TW 本地化**（顯示名「呼呼會員方案」）— 缺此項會導致三檔訂閱 Missing Metadata
 - [x] 消耗型 small/medium/large Ready to Submit，已附 iOS 1.0
 - [x] 訂閱 lite/basic/premium Ready to Submit，已附 iOS 1.0
-- [x] 審核聯絡人／Notes 已填（**電話佔位 +886912345678 需更正**）
+- [x] 審核聯絡人／Notes 已填（電話 **+886902491594**；2026-06-09 瀏覽器確認）
 - [x] 營運對照表：`pnpm export:iap-store-checklist` → `dist/iap-store-checklist/`
 - [ ] App 版本截圖（`dist/aso-screenshots/tw/` 或 `pnpm package:store-upload`）
 - [ ] 各區域價格層級對齊 PPP（訂閱 availability 已設；消耗型已完成）
