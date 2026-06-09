@@ -12,7 +12,7 @@ import {
   getPricing,
   SUBSCRIPTION_PRICES_USD,
 } from "@huhu/shared";
-import { fetchProdIapReadiness, renderApiBase } from "./lib/render-prod.mjs";
+import { fetchProdIapReadiness, renderApiBase, fetchProdPlayCatalogProbe } from "./lib/render-prod.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -120,6 +120,12 @@ try {
     console.log(
       `Render production: androidProductionReady=${prod.androidProductionReady ?? false} iosProductionReady=${prod.iosProductionReady ?? false} playApi=${prod.android?.playApi ?? false}`,
     );
+    const catalog = await fetchProdPlayCatalogProbe(renderApiBase());
+    if (catalog) {
+      console.log(
+        `Render play catalog: catalogReady=${catalog.catalogReady ?? false} (subs=${catalog.subscriptions?.length ?? 0} coins=${catalog.oneTime?.length ?? 0})`,
+      );
+    }
     if (prod.androidProductionReady && !r.androidProductionReady) {
       console.log("  → Local env lacks Play SA; production Android IAP is ready");
     }

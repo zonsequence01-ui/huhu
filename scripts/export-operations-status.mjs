@@ -17,6 +17,7 @@ import {
 import {
   fetchProdIapReadiness,
   fetchProdPlayApiProbe,
+  fetchProdPlayCatalogProbe,
   renderApiBase,
 } from "./lib/render-prod.mjs";
 
@@ -70,7 +71,7 @@ async function fetchStatus(url) {
   }
 }
 
-const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe] = await Promise.all([
+const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe, playCatalogProbe] = await Promise.all([
   fetchStatus(STORE_PRIVACY_URL),
   fetchStatus(STORE_SUPPORT_URL),
   fetchStatus(`${siteBase}/health`),
@@ -91,6 +92,13 @@ const [privacyStatus, supportStatus, healthStatus, renderHealth, playApiProbe] =
     if (!probe) return "unreachable";
     return `oauth=${probe.oauthOk} apiAccess=${probe.apiAccessOk}${probe.probeEndpoint ? ` endpoint=${probe.probeEndpoint}` : ""}`;
   })(),
+  (async () => {
+    const cat = await fetchProdPlayCatalogProbe(renderBase);
+    if (!cat) return "unreachable";
+    const subs = cat.subscriptions?.length ?? 0;
+    const coins = cat.oneTime?.length ?? 0;
+    return `catalogReady=${cat.catalogReady ?? false} subs=${subs} coins=${coins}`;
+  })(),
 ]);
 const prodSite = healthStatus === "200" ? "up" : healthStatus;
 
@@ -108,6 +116,7 @@ const lines = [
   `- /health: **${prodSite}**`,
   `- Render API: **${renderHealth}** (\`pnpm check:render\`)`,
   `- Play API probe: **${playApiProbe}** (\`pnpm check:play-api\`)`,
+  `- Play catalog probe: **${playCatalogProbe}** (\`pnpm check:play-catalog\`)`,
   `- check: \`pnpm check:site\` (blocks Play/ASC until privacy 200)`,
   `- verify: \`pnpm smoke:api:prod\` (uses PROD_SMOKE_URL to override)`,
   `- deploy: \`pnpm export:deploy-bundle\` → \`deploy-remote-static.example.sh\` (Phase 1)`,

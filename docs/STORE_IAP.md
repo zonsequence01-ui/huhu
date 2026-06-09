@@ -36,7 +36,7 @@ Bundle ID：`com.ctrlz.huhu`。產品 ID 以 `packages/shared/src/iap-products.t
 - [x] 服務帳戶 JSON → Render Secret File（`pnpm export:play-api-setup`）
 - [x] Play Console **邀請 SA 使用者**（Users 2 位；呼呼 Huhu 4 項應用程式權限）
 - [x] `pnpm check:play-api` → `apiAccessOk=true`（Render `513942e`；probe=`oneTimeProducts`）
-- [ ] `pnpm check:play-catalog` → `catalogReady=true`（部署 `play-catalog-probe` 後驗證六檔 SKU）
+- [x] `pnpm check:play-catalog` → `catalogReady=true`（Render `200218f`；六檔 SKU 齊全）
 - [ ] 封閉測試驗證 `gp:<token>` 收據（Alpha 封測中；需 12 opt-in 測試者）
 
 ## 客戶端

@@ -32,3 +32,16 @@ export async function fetchProdPlayApiProbe(base = renderApiBase()) {
     return null;
   }
 }
+
+export async function fetchProdPlayCatalogProbe(base = renderApiBase()) {
+  try {
+    const res = await fetch(`${base}/v1/meta/play-catalog-probe`, {
+      signal: AbortSignal.timeout(45_000),
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body.catalog ?? body;
+  } catch {
+    return null;
+  }
+}
